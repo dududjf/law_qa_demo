@@ -13,9 +13,11 @@
 
 ## 安装依赖
 
+python 3.11
 ```bash
 # 安装Python依赖
 pip install -r requirements.txt
+
 
 # 安装系统依赖（ffmpeg）
 # Windows: choco install ffmpeg
@@ -26,3 +28,8 @@ pip install -r requirements.txt
 在app.py中
 ## 运行方式
 python app.py
+
+可以在
+
+
+![界面截图](./images/main-page.png)

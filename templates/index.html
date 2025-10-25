@@ -1,19 +1,22 @@
 <html lang="zh-CN">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>涉外法语音问答系统</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Flask 项目通常需要这样引入 -->
     {#
-    <link href="/static/libs/font-awesome.min.css" rel="stylesheet">#}
-    {#
-    <script src="/static/libs/marked.min.js"></script>#}
+    <link href="/static/libs/font-awesome.min.css" rel="stylesheet" />
+    #} {#
+    <script src="/static/libs/marked.min.js"></script>
+    #}
 
     <!-- 替换Font Awesome的CDN（使用cdnjs，稳定性较高） -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
 
     <!-- 替换marked的CDN（指定具体版本，避免自动升级问题） -->
 
@@ -21,681 +24,756 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     <!-- 配置Tailwind自定义主题 - 统一蓝色系配色 -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#165DFF',
-                        secondary: '#E8F3FF',
-                        accent: '#4080FF',
-                        success: '#00B42A',
-                        danger: '#F53F3F',
-                        neutral: '#F5F7FA',
-                        'neutral-dark': '#E5E6EB',
-                        'text-primary': '#1D2129',
-                        'text-secondary': '#4E5969',
-                        'text-tertiary': '#86909C'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'card': '0 2px 14px 0 rgba(22, 93, 255, 0.08)',
-                        'hover': '0 4px 20px 0 rgba(22, 93, 255, 0.12)',
-                    }
-                },
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#165DFF",
+              secondary: "#E8F3FF",
+              accent: "#4080FF",
+              success: "#00B42A",
+              danger: "#F53F3F",
+              neutral: "#F5F7FA",
+              "neutral-dark": "#E5E6EB",
+              "text-primary": "#1D2129",
+              "text-secondary": "#4E5969",
+              "text-tertiary": "#86909C",
+            },
+            fontFamily: {
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+            boxShadow: {
+              card: "0 2px 14px 0 rgba(22, 93, 255, 0.08)",
+              hover: "0 4px 20px 0 rgba(22, 93, 255, 0.12)",
+            },
+          },
+        },
+      };
     </script>
 
     <style type="text/tailwindcss">
-        @layer utilities {
-            .content-auto {
-                content-visibility: auto;
-            }
-
-            .scrollbar-hide {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-
-            .scrollbar-hide::-webkit-scrollbar {
-                display: none;
-            }
-
-            .animate-fade-in {
-                animation: fadeIn 0.3s ease-in-out;
-            }
-
-            .animate-slide-up {
-                animation: slideUp 0.3s ease-out;
-            }
-
-            .text-balance {
-                text-wrap: normal;
-            }
-
-            .recording-pulse {
-                animation: pulse 1.5s infinite;
-            }
-
-            .pulse-ring {
-                position: relative;
-            }
-
-            .pulse-ring::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                border-radius: 50%;
-                border: 2px solid #165DFF;
-                animation: ring 1.5s infinite;
-            }
-
-            .audio-btn-active {
-                animation: audioWave 1.5s infinite;
-            }
-
-
+      @layer utilities {
+        .content-auto {
+          content-visibility: auto;
         }
 
-        .think-content {
-            font-size: 0.875rem !important; /* 小字体 */
-            color: #86909C !important; /* 浅色 */
-            margin: 0.5rem 0 !important;
-            padding-left: 0.5rem !important;
-            border-left: 2px solid #E5E6EB !important; /* 左侧装饰线 */
-            display: block !important; /* 确保margin/padding生效（span默认是行内元素） */
-
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
 
-        think {
-            font-size: 0.875rem !important; /* 小字体 */
-            color: #86909C !important; /* 浅色 */
-            margin: 0.5rem 0 !important;
-            padding-left: 0.5rem !important;
-            border-left: 2px solid #E5E6EB !important; /* 左侧装饰线 */
-            display: block !important; /* 确保margin/padding生效（span默认是行内元素） */
-
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-in-out;
         }
 
-        @keyframes slideUp {
-            from {
-                transform: translateY(10px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .animate-slide-up {
+          animation: slideUp 0.3s ease-out;
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.8;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+        .text-balance {
+          text-wrap: normal;
         }
 
-        @keyframes ring {
-            0% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(22, 93, 255, 0.7);
-            }
-            70% {
-                transform: scale(1);
-                box-shadow: 0 0 0 10px rgba(22, 93, 255, 0);
-            }
-            100% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(22, 93, 255, 0);
-            }
+        .recording-pulse {
+          animation: pulse 1.5s infinite;
         }
 
-        @keyframes audioWave {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
+        .pulse-ring {
+          position: relative;
         }
 
-        /* 在样式表中添加（而非内联） */
-        .input-box {
-            max-height: 150px;
-
+        .pulse-ring::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: 50%;
+          border: 2px solid #165dff;
+          animation: ring 1.5s infinite;
         }
 
-        .hidden {
-            display: none !important; /* 确保优先级 */
+        .audio-btn-active {
+          animation: audioWave 1.5s infinite;
         }
+      }
 
-        /* 为历史对话列表容器添加无滚动条的滚动样式 */
-        #conversationsList {
-            /* 确保容器可以滚动 */
-            overflow-y: auto;
-            /* 隐藏滚动条 - WebKit 浏览器 (Chrome, Safari) */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE 和 Edge */
+      .think-content {
+        font-size: 0.875rem !important; /* 小字体 */
+        color: #86909c !important; /* 浅色 */
+        margin: 0.5rem 0 !important;
+        padding-left: 0.5rem !important;
+        border-left: 2px solid #e5e6eb !important; /* 左侧装饰线 */
+        display: block !important; /* 确保margin/padding生效（span默认是行内元素） */
+      }
+
+      think {
+        font-size: 0.875rem !important; /* 小字体 */
+        color: #86909c !important; /* 浅色 */
+        margin: 0.5rem 0 !important;
+        padding-left: 0.5rem !important;
+        border-left: 2px solid #e5e6eb !important; /* 左侧装饰线 */
+        display: block !important; /* 确保margin/padding生效（span默认是行内元素） */
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
         }
-
-        /* 隐藏 WebKit 浏览器的滚动条 */
-        #conversationsList::-webkit-scrollbar {
-            display: none;
+        to {
+          opacity: 1;
         }
+      }
 
-        /* 可选：添加悬停效果增强用户体验 */
-        #conversationsList .conversation-item {
-            transition: background-color 0.2s ease;
+      @keyframes slideUp {
+        from {
+          transform: translateY(10px);
+          opacity: 0;
         }
-
-        #conversationsList .conversation-item:hover {
-            background-color: rgba(0, 0, 0, 0.03);
+        to {
+          transform: translateY(0);
+          opacity: 1;
         }
+      }
 
-        /* 确保侧边栏高度正确，为滚动提供足够空间 */
-        #sidebar {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 1;
         }
-
-        /* 确保内容区域可以占据剩余空间用于滚动 */
-        #conversationsList {
-            flex: 1;
-            min-height: 0; /* 解决 flex 容器中子元素高度问题 */
+        50% {
+          transform: scale(1.1);
+          opacity: 0.8;
         }
-
-        button#controlSide {
-            position: absolute;
-            right: 0; /* 使按钮位于aside的右侧 */
-            top: 50%; /* 使按钮在垂直方向上位于中间 */
-            transform: translateY(-50%); /* 向上平移按钮自身高度的一半，使其完全居中 */
-            z-index: 50; /* 确保按钮在其他元素之上 */
+        100% {
+          transform: scale(1);
+          opacity: 1;
         }
+      }
 
+      @keyframes ring {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(22, 93, 255, 0.7);
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 10px rgba(22, 93, 255, 0);
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(22, 93, 255, 0);
+        }
+      }
+
+      @keyframes audioWave {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      /* 在样式表中添加（而非内联） */
+      .input-box {
+        max-height: 150px;
+      }
+
+      .hidden {
+        display: none !important; /* 确保优先级 */
+      }
+
+      /* 为历史对话列表容器添加无滚动条的滚动样式 */
+      #conversationsList {
+        /* 确保容器可以滚动 */
+        overflow-y: auto;
+        /* 隐藏滚动条 - WebKit 浏览器 (Chrome, Safari) */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE 和 Edge */
+      }
+
+      /* 隐藏 WebKit 浏览器的滚动条 */
+      #conversationsList::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* 可选：添加悬停效果增强用户体验 */
+      #conversationsList .conversation-item {
+        transition: background-color 0.2s ease;
+      }
+
+      #conversationsList .conversation-item:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+      }
+
+      /* 确保侧边栏高度正确，为滚动提供足够空间 */
+      #sidebar {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      /* 确保内容区域可以占据剩余空间用于滚动 */
+      #conversationsList {
+        flex: 1;
+        min-height: 0; /* 解决 flex 容器中子元素高度问题 */
+      }
+
+      button#controlSide {
+        position: absolute;
+        right: 0; /* 使按钮位于aside的右侧 */
+        top: 50%; /* 使按钮在垂直方向上位于中间 */
+        transform: translateY(
+          -50%
+        ); /* 向上平移按钮自身高度的一半，使其完全居中 */
+        z-index: 50; /* 确保按钮在其他元素之上 */
+      }
     </style>
+  </head>
 
-</head>
-
-<body class="bg-neutral font-sans text-text-primary antialiased">
-
-
-<div id="loginModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 animate-slide-up">
+  <body class="bg-neutral font-sans text-text-primary antialiased">
+    <div
+      id="loginModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 animate-slide-up"
+      >
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-semibold text-primary">用户登录</h3>
-            <button id="closeLoginModal" class="text-text-tertiary hover:text-primary transition-colors hidden">
-                <i class="fa fa-times"></i>
-            </button>
+          <h3 class="text-xl font-semibold text-primary">用户登录</h3>
+          <button
+            id="closeLoginModal"
+            class="text-text-tertiary hover:text-primary transition-colors hidden"
+          >
+            <i class="fa fa-times"></i>
+          </button>
         </div>
 
         <form id="loginForm" class="space-y-4">
-            <div>
-                <label for="username" class="block text-sm font-medium text-text-secondary mb-1">用户名</label>
-                <input type="text" id="username" name="username"
-                       class="w-full px-4 py-2 border border-neutral-dark rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
-                       placeholder="请输入用户名" required>
-            </div>
+          <div>
+            <label
+              for="username"
+              class="block text-sm font-medium text-text-secondary mb-1"
+              >用户名</label
+            >
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="w-full px-4 py-2 border border-neutral-dark rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
+              placeholder="请输入用户名"
+              required
+            />
+          </div>
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-text-secondary mb-1">密码</label>
-                <input type="password" id="password" name="password"
-                       class="w-full px-4 py-2 border border-neutral-dark rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
-                       placeholder="请输入密码" required>
-            </div>
+          <div>
+            <label
+              for="password"
+              class="block text-sm font-medium text-text-secondary mb-1"
+              >密码</label
+            >
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="w-full px-4 py-2 border border-neutral-dark rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
+              placeholder="请输入密码"
+              required
+            />
+          </div>
 
-
-            <button type="submit"
-                    class="w-full py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all shadow-sm font-medium">
-                登录
-            </button>
+          <button
+            type="submit"
+            class="w-full py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all shadow-sm font-medium"
+          >
+            登录
+          </button>
         </form>
-
-
+      </div>
     </div>
-</div>
 
-<div class="flex h-screen overflow-hidden">
-    <!-- 侧边栏：历史对话 -->
+    <div class="flex h-screen overflow-hidden">
+      <!-- 侧边栏：历史对话 -->
 
-    <aside id="sidebar"
-           class="bg-white border-r border-neutral-dark md:block overflow-hidden flex flex-col">
+      <aside
+        id="sidebar"
+        class="bg-white border-r border-neutral-dark md:block overflow-hidden flex flex-col"
+      >
         <div class="p-4 border-b border-neutral-dark">
-
-            <h2 class="text-lg font-medium">历史对话</h2>
-            <button id="newConversationBtn"
-                    class="mt-2 w-full flex items-center justify-center px-3 py-1.5 text-primary border border-primary/30 rounded-lg hover:bg-secondary transition-colors text-sm hidden">
-                <i class="fa fa-plus mr-1"></i> 新对话
-            </button>
-
+          <h2 class="text-lg font-medium">历史对话</h2>
+          <button
+            id="newConversationBtn"
+            class="mt-2 w-full flex items-center justify-center px-3 py-1.5 text-primary border border-primary/30 rounded-lg hover:bg-secondary transition-colors text-sm hidden"
+          >
+            <i class="fa fa-plus mr-1"></i> 新对话
+          </button>
         </div>
 
-        <div id="conversationsList" class=" w-58  flex-1 overflow-y-auto scrollbar-hide p-2">
-            <!-- 历史对话列表将动态生成 -->
-            <div class="text-center text-text-tertiary text-sm py-8">
-                登录后查看历史对话
-            </div>
+        <div
+          id="conversationsList"
+          class="w-58 flex-1 overflow-y-auto scrollbar-hide p-2"
+        >
+          <!-- 历史对话列表将动态生成 -->
+          <div class="text-center text-text-tertiary text-sm py-8">
+            登录后查看历史对话
+          </div>
         </div>
 
         <div class="p-4 border-t border-neutral-dark">
-            <div id="userInfo" class="hidden">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <i class="fa fa-user"></i>
-                    </div>
-                    <span id="currentUsername" class="ml-2 text-sm font-medium"></span>
-                </div>
-                <button id="logoutBtn"
-                        class="mt-2 w-full text-sm text-text-tertiary hover:text-danger transition-colors">
-                    <i class="fa fa-sign-out mr-1"></i> 退出登录
-                </button>
+          <div id="userInfo" class="hidden">
+            <div class="flex items-center">
+              <div
+                class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+              >
+                <i class="fa fa-user"></i>
+              </div>
+              <span
+                id="currentUsername"
+                class="ml-2 text-sm font-medium"
+              ></span>
             </div>
+            <button
+              id="logoutBtn"
+              class="mt-2 w-full text-sm text-text-tertiary hover:text-danger transition-colors"
+            >
+              <i class="fa fa-sign-out mr-1"></i> 退出登录
+            </button>
+          </div>
         </div>
-    </aside>
+      </aside>
 
-
-    <button id="controlSide"
-            class="fixed left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-neutral-dark shadow-md flex items-center justify-center hover:bg-neutral-50 hover:shadow-lg active:bg-neutral-100 transition-all duration-300 ease-in-out z-50">
-        <i class="fa fa-chevron-right text-neutral-700 transition-transform duration-300"></i>
-    </button>
-    <!-- 主对话区域 -->
-    <main class="flex-1 flex flex-col overflow-hidden">
+      <button
+        id="controlSide"
+        class="fixed left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-neutral-dark shadow-md flex items-center justify-center hover:bg-neutral-50 hover:shadow-lg active:bg-neutral-100 transition-all duration-300 ease-in-out z-50"
+      >
+        <i
+          class="fa fa-chevron-right text-neutral-700 transition-transform duration-300"
+        ></i>
+      </button>
+      <!-- 主对话区域 -->
+      <main class="flex-1 flex flex-col overflow-hidden">
         <!-- 顶部导航 -->
-        <header class="bg-white border-b border-neutral-dark p-4 flex justify-between items-center shadow-sm">
-            <div class="md:hidden flex items-center">
-                <button id="mobileMenuBtn"
-                        class="text-text-secondary p-2 hover:text-primary hover:bg-secondary rounded-full transition-colors">
-                    <i class="fa fa-bars"></i>
-                </button>
-                <h1 class="text-lg font-bold text-primary ml-2">智能问答助手</h1>
-            </div>
+        <header
+          class="bg-white border-b border-neutral-dark p-4 flex justify-between items-center shadow-sm"
+        >
+          <div class="md:hidden flex items-center">
+            <button
+              id="mobileMenuBtn"
+              class="text-text-secondary p-2 hover:text-primary hover:bg-secondary rounded-full transition-colors"
+            >
+              <i class="fa fa-bars"></i>
+            </button>
+            <h1 class="text-lg font-bold text-primary ml-2">智能问答助手</h1>
+          </div>
 
-            <div class="hidden md:block">
-                <h2 class="text-lg font-medium">当前对话</h2>
-            </div>
+          <div class="hidden md:block">
+            <h2 class="text-lg font-medium">当前对话</h2>
+          </div>
 
-            <div class="flex items-center">
-                <button id="userMenuBtn"
-                        class="text-text-secondary p-2 hover:text-primary hover:bg-secondary rounded-full transition-colors hidden md:flex">
-                    <i class="fa fa-user-circle"></i>
-                </button>
-            </div>
-            <div class="flex items-center">
-                <button id="loginBtn"
-                        class="text-text-secondary p-2 hover:text-primary hover:bg-secondary rounded-full transition-colors">
-                    <i class="fa fa-sign-in"></i>
-                    <span class="ml-1  md:inline">登录</span>
-                </button>
-            </div>
+          <div class="flex items-center">
+            <button
+              id="userMenuBtn"
+              class="text-text-secondary p-2 hover:text-primary hover:bg-secondary rounded-full transition-colors hidden md:flex"
+            >
+              <i class="fa fa-user-circle"></i>
+            </button>
+          </div>
+          <div class="flex items-center">
+            <button
+              id="loginBtn"
+              class="text-text-secondary p-2 hover:text-primary hover:bg-secondary rounded-full transition-colors"
+            >
+              <i class="fa fa-sign-in"></i>
+              <span class="ml-1 md:inline">登录</span>
+            </button>
+          </div>
         </header>
 
         <!-- 对话内容区域 -->
-        <div id="conversationContainer"
-             class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide bg-gradient-to-b from-white to-neutral/50">
-            <div id="messageContainer" class="max-w-3xl mx-auto space-y-6">
-                <!-- 消息内容在这里动态添加 -->
-            </div>
+        <div
+          id="conversationContainer"
+          class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide bg-gradient-to-b from-white to-neutral/50"
+        >
+          <div id="messageContainer" class="max-w-3xl mx-auto space-y-6">
+            <!-- 消息内容在这里动态添加 -->
+          </div>
 
-            <!-- 加载指示器 -->
-            <div id="loadingIndicator" class="max-w-3xl mx-auto hidden">
-                <div class="bg-white p-4 rounded-2xl shadow-card inline-block animate-fade-in">
-                    <div class="flex items-start">
-                        <div
-                                class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0 mr-4">
-                            <i class="fa fa-robot"></i>
-                        </div>
-                        <div class="flex space-x-1">
-                            <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
-                                 style="animation-delay: 0ms"></div>
-                            <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
-                                 style="animation-delay: 150ms"></div>
-                            <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
-                                 style="animation-delay: 300ms"></div>
-                        </div>
-                    </div>
+          <!-- 加载指示器 -->
+          <div id="loadingIndicator" class="max-w-3xl mx-auto hidden">
+            <div
+              class="bg-white p-4 rounded-2xl shadow-card inline-block animate-fade-in"
+            >
+              <div class="flex items-start">
+                <div
+                  class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0 mr-4"
+                >
+                  <i class="fa fa-robot"></i>
                 </div>
+                <div class="flex space-x-1">
+                  <div
+                    class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                    style="animation-delay: 0ms"
+                  ></div>
+                  <div
+                    class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                    style="animation-delay: 150ms"
+                  ></div>
+                  <div
+                    class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                    style="animation-delay: 300ms"
+                  ></div>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <!-- 在消息容器上方添加下拉按钮 (index.html 中 #conversationContainer 内) -->
-            <!-- 新增：回到底部按钮 -->
-            <div id="scrollToBottomBtnContainer" class="fixed right-6 bottom-20 z-10 hidden">
-                <button id="scrollToBottomBtn"
-                        class="w-12 h-12 rounded-full bg-primary text-white shadow-card flex items-center justify-center hover:bg-primary/90 transition-all">
-                    <i class="fa fa-arrow-down"></i>
-                </button>
-            </div>
+          <!-- 在消息容器上方添加下拉按钮 (index.html 中 #conversationContainer 内) -->
+          <!-- 新增：回到底部按钮 -->
+          <div
+            id="scrollToBottomBtnContainer"
+            class="fixed right-6 bottom-20 z-10 hidden"
+          >
+            <button
+              id="scrollToBottomBtn"
+              class="w-12 h-12 rounded-full bg-primary text-white shadow-card flex items-center justify-center hover:bg-primary/90 transition-all"
+            >
+              <i class="fa fa-arrow-down"></i>
+            </button>
+          </div>
         </div>
-
 
         <!-- 输入区域 -->
         <div class="bg-white border-t border-neutral-dark p-4 md:p-6">
-            <div class="max-w-3xl mx-auto">
-                <!-- 转录文本预览 -->
-                <div id="transcriptBox" class="mb-4 p-3 bg-neutral rounded-xl text-text-secondary
-                                           overflow-hidden relative transition-all duration-200
-                                           hover:shadow-sm">
-                        <textarea id="transcriptInput" class="w-full bg-transparent border-none outline-none resize-none
-                                   text-text-primary input-box whitespace-pre-wrap break-words
-                                   focus:placeholder:text-text-secondary/40
-                                   transition-all duration-200" placeholder="请输入文本或点击录音按钮..."
-                                  rows="1"></textarea>
+          <div class="max-w-3xl mx-auto">
+            <!-- 转录文本预览 -->
+            <div
+              id="transcriptBox"
+              class="mb-4 p-3 bg-neutral rounded-xl text-text-secondary overflow-hidden relative transition-all duration-200 hover:shadow-sm"
+            >
+              <textarea
+                id="transcriptInput"
+                class="w-full bg-transparent border-none outline-none resize-none text-text-primary input-box whitespace-pre-wrap break-words focus:placeholder:text-text-secondary/40 transition-all duration-200"
+                placeholder="请输入文本或点击录音按钮..."
+                rows="1"
+              ></textarea>
 
-                    <button id="clearTranscriptBtn" class="absolute right-3 top-2 text-xs text-text-secondary/60
-                                   hover:text-text-danger hover:scale-110
-                                   transition-all duration-200 opacity-0 invisible
-                                   focus:outline-none focus:ring-1 focus:ring-text-secondary/30"
-                            aria-label="清空输入文本"
-                            disabled>
-                        <i class="fa fa-times-circle"></i>
-                    </button>
-                </div>
-
-                <!-- 控制按钮 -->
-                <div class="flex flex-wrap items-center gap-3 mb-3">
-                    <button id="startBtn"
-                            class="flex items-center px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all shadow-sm group"
-                    >
-                        <i class="fa fa-microphone mr-2 group-hover:scale-110 transition-transform"></i>
-                        <span>开始录音</span>
-                    </button>
-                    <button id="stopBtn"
-                            class="flex items-center px-4 py-2.5 bg-primary/90 text-white rounded-lg hover:bg-primary transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled>
-                        <i class="fa fa-stop mr-2"></i>
-                        <span>停止录音</span>
-                    </button>
-                    <button id="askBtn"
-                            class="flex items-center px-4 py-2.5 bg-accent text-white rounded-lg hover:bg-primary transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled>
-                        <i class="fa fa-paper-plane mr-2"></i>
-                        <span>获取答案</span>
-                    </button>
-                </div>
-
-                <!-- 状态信息 -->
-                <div id="status" class="text-text-tertiary text-sm text-center">
-                    请先登录以使用系统功能
-                </div>
+              <button
+                id="clearTranscriptBtn"
+                class="absolute right-3 top-2 text-xs text-text-secondary/60 hover:text-text-danger hover:scale-110 transition-all duration-200 opacity-0 invisible focus:outline-none focus:ring-1 focus:ring-text-secondary/30"
+                aria-label="清空输入文本"
+                disabled
+              >
+                <i class="fa fa-times-circle"></i>
+              </button>
             </div>
+
+            <!-- 控制按钮 -->
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <button
+                id="startBtn"
+                class="flex items-center px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all shadow-sm group"
+              >
+                <i
+                  class="fa fa-microphone mr-2 group-hover:scale-110 transition-transform"
+                ></i>
+                <span>开始录音</span>
+              </button>
+              <button
+                id="stopBtn"
+                class="flex items-center px-4 py-2.5 bg-primary/90 text-white rounded-lg hover:bg-primary transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                <i class="fa fa-stop mr-2"></i>
+                <span>停止录音</span>
+              </button>
+              <button
+                id="askBtn"
+                class="flex items-center px-4 py-2.5 bg-accent text-white rounded-lg hover:bg-primary transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                <i class="fa fa-paper-plane mr-2"></i>
+                <span>获取答案</span>
+              </button>
+            </div>
+
+            <!-- 状态信息 -->
+            <div id="status" class="text-text-tertiary text-sm text-center">
+              请先登录以使用系统功能
+            </div>
+          </div>
         </div>
-    </main>
-</div>
+      </main>
+    </div>
 
+    <script>
+      // DOM元素引用
+      const startBtn = document.getElementById("startBtn"); // 开始录音按钮
+      const stopBtn = document.getElementById("stopBtn"); // 停止录音按钮
+      const askBtn = document.getElementById("askBtn"); // 获取答案按钮
+      const statusEl = document.getElementById("status"); // 状态提示文本
+      const transcriptInput = document.getElementById("transcriptInput"); // 文本输入框
+      const messageContainer = document.getElementById("messageContainer"); // 对话消息容器
+      const loadingIndicator = document.getElementById("loadingIndicator"); // 加载动画
 
-<script>
-    // DOM元素引用
-    const startBtn = document.getElementById('startBtn'); // 开始录音按钮
-    const stopBtn = document.getElementById('stopBtn');   // 停止录音按钮
-    const askBtn = document.getElementById('askBtn');     // 获取答案按钮
-    const statusEl = document.getElementById('status');   // 状态提示文本
-    const transcriptInput = document.getElementById('transcriptInput'); // 文本输入框
-    const messageContainer = document.getElementById('messageContainer'); // 对话消息容器
-    const loadingIndicator = document.getElementById('loadingIndicator'); // 加载动画
+      const clearTranscriptBtn = document.getElementById("clearTranscriptBtn");
+      const controlSide = document.getElementById("controlSide");
 
-    const clearTranscriptBtn = document.getElementById('clearTranscriptBtn');
-    const controlSide = document.getElementById('controlSide');
+      // 登录相关元素
+      const loginModal = document.getElementById("loginModal");
+      const loginForm = document.getElementById("loginForm");
+      const closeLoginModal = document.getElementById("closeLoginModal");
+      const userInfo = document.getElementById("userInfo");
+      const currentUsername = document.getElementById("currentUsername");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const userMenuBtn = document.getElementById("userMenuBtn");
 
+      // 历史对话相关元素
+      const sidebar = document.getElementById("sidebar");
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const conversationsList = document.getElementById("conversationsList");
+      const newConversationBtn = document.getElementById("newConversationBtn");
+      let isLoggedIn = false;
+      let currentUser = null;
+      let conversations = [];
+      let currentConversationId = null;
 
-    // 登录相关元素
-    const loginModal = document.getElementById('loginModal');
-    const loginForm = document.getElementById('loginForm');
-    const closeLoginModal = document.getElementById('closeLoginModal');
-    const userInfo = document.getElementById('userInfo');
-    const currentUsername = document.getElementById('currentUsername');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const userMenuBtn = document.getElementById('userMenuBtn');
+      let isSide = true;
 
-    // 历史对话相关元素
-    const sidebar = document.getElementById('sidebar');
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const conversationsList = document.getElementById('conversationsList');
-    const newConversationBtn = document.getElementById('newConversationBtn');
-    let isLoggedIn = false;
-    let currentUser = null;
-    let conversations = [];
-    let currentConversationId = null;
+      let currentAudio = null; // 用于跟踪正在播放的音频实例
+      let isPlaying = false; // 音频播放状态
 
-    let isSide = true;
+      // let speechCache = '';         // 累计文本缓存
+      let isSpeaking = false; // 语音播放状态锁（避免重叠播放）
 
-    let currentAudio = null; // 用于跟踪正在播放的音频实例
-    let isPlaying = false;  // 音频播放状态
-
-    // let speechCache = '';         // 累计文本缓存
-    let isSpeaking = false;       // 语音播放状态锁（避免重叠播放）
-
-
-    // 在 DOM 加载完成后初始化（替换原逻辑）
-    document.addEventListener('DOMContentLoaded', () => {
+      // 在 DOM 加载完成后初始化（替换原逻辑）
+      document.addEventListener("DOMContentLoaded", () => {
         // 其他初始化逻辑...
 
         // 获取滚动容器和按钮元素
-        const scrollContainer = document.getElementById('conversationContainer');
-        const scrollBtn = document.getElementById('scrollToBottomBtn');
-        const scrollBtnContainer = document.getElementById('scrollToBottomBtnContainer');
+        const scrollContainer = document.getElementById(
+          "conversationContainer"
+        );
+        const scrollBtn = document.getElementById("scrollToBottomBtn");
+        const scrollBtnContainer = document.getElementById(
+          "scrollToBottomBtnContainer"
+        );
 
         // 确保元素存在
         if (!scrollContainer || !scrollBtn || !scrollBtnContainer) {
-            console.error('未找到滚动容器或按钮元素');
-            return;
+          console.error("未找到滚动容器或按钮元素");
+          return;
         }
 
         // 修正滚动到底部函数
         function scrollToBottom() {
-            console.log('滚动到底部，容器高度：', scrollContainer.scrollHeight);
-            scrollContainer.scrollTo({
-                top: scrollContainer.scrollHeight,
-                behavior: 'smooth'
-            });
+          console.log("滚动到底部，容器高度：", scrollContainer.scrollHeight);
+          scrollContainer.scrollTo({
+            top: scrollContainer.scrollHeight,
+            behavior: "smooth",
+          });
         }
 
         // 优化按钮显示/隐藏逻辑
         function toggleScrollButton() {
-            const scrollPosition = scrollContainer.scrollTop; // 当前滚动位置
-            const containerHeight = scrollContainer.clientHeight; // 容器可视高度
-            const contentHeight = scrollContainer.scrollHeight; // 内容总高度
+          const scrollPosition = scrollContainer.scrollTop; // 当前滚动位置
+          const containerHeight = scrollContainer.clientHeight; // 容器可视高度
+          const contentHeight = scrollContainer.scrollHeight; // 内容总高度
 
-            // 计算可视区域底部距离内容底部的距离
-            const distanceToBottom = contentHeight - (scrollPosition + containerHeight);
+          // 计算可视区域底部距离内容底部的距离
+          const distanceToBottom =
+            contentHeight - (scrollPosition + containerHeight);
 
-            // 调试信息（可删除）
-            //  console.log(`滚动位置: ${scrollPosition}, 可视高度: ${containerHeight}, 总高度: ${contentHeight}, 距离底部: ${distanceToBottom}`);
+          // 调试信息（可删除）
+          //  console.log(`滚动位置: ${scrollPosition}, 可视高度: ${containerHeight}, 总高度: ${contentHeight}, 距离底部: ${distanceToBottom}`);
 
-            // 阈值调整为 50px：只要没到底部附近就显示按钮
-            if (distanceToBottom > 50) {
-                scrollBtnContainer.classList.remove('hidden');
-            } else {
-                scrollBtnContainer.classList.add('hidden');
-            }
+          // 阈值调整为 50px：只要没到底部附近就显示按钮
+          if (distanceToBottom > 50) {
+            scrollBtnContainer.classList.remove("hidden");
+          } else {
+            scrollBtnContainer.classList.add("hidden");
+          }
         }
 
         // 绑定事件
-        scrollBtn.addEventListener('click', scrollToBottom);
-        scrollContainer.addEventListener('scroll', toggleScrollButton);
+        scrollBtn.addEventListener("click", scrollToBottom);
+        scrollContainer.addEventListener("scroll", toggleScrollButton);
 
         // 初始检查（页面加载时判断一次）
         toggleScrollButton();
-    });
-    // 创建新对话
-    const loginPanel = loginModal.querySelector('.bg-white'); // 白色登录面板（需排除点击）
+      });
+      // 创建新对话
+      const loginPanel = loginModal.querySelector(".bg-white"); // 白色登录面板（需排除点击）
 
-    // 2. 封装关闭面板的通用函数（复用）
-    function closeLoginPanel() {
-        loginModal.classList.add('hidden'); // 添加hidden类隐藏面板
+      // 2. 封装关闭面板的通用函数（复用）
+      function closeLoginPanel() {
+        loginModal.classList.add("hidden"); // 添加hidden类隐藏面板
         // 可选：清空表单内容（提升用户体验）
-        document.getElementById('loginForm').reset();
-    }
+        document.getElementById("loginForm").reset();
+      }
 
-    // 3. 点击背景层关闭面板（核心逻辑）
-    loginModal.addEventListener('click', function (event) {
+      // 3. 点击背景层关闭面板（核心逻辑）
+      loginModal.addEventListener("click", function (event) {
         // 关键判断：点击的是「模态框本身」且「不是面板内部元素」
         if (event.target === loginModal && !loginPanel.contains(event.target)) {
-            closeLoginPanel();
+          closeLoginPanel();
         }
-    });
+      });
 
-
-    // 获取历史对话列表
-    // 获取并渲染历史对话（修改版）
-    // 获取并渲染历史对话
-    // 修改loadHistory函数，将历史记录同步到conversations数组
-    async function loadHistory() {
+      // 获取历史对话列表
+      // 获取并渲染历史对话（修改版）
+      // 获取并渲染历史对话
+      // 修改loadHistory函数，将历史记录同步到conversations数组
+      async function loadHistory() {
         try {
-            const token = localStorage.getItem('currentUser_token');
-            if (!token) return;
+          const token = localStorage.getItem("currentUser_token");
+          if (!token) return;
 
-            const response = await fetch('/get_history', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                }
-            });
+          const response = await fetch("/get_history", {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
 
-            if (!response.ok) {
-                console.error("获取历史失败:", await response.text());
-                return;
-            }
+          if (!response.ok) {
+            console.error("获取历史失败:", await response.text());
+            return;
+          }
 
-            const historyList = await response.json(); // 后端返回的结构: [{id, title, messages: [], timestamp}, ...]
+          const historyList = await response.json(); // 后端返回的结构: [{id, title, messages: [], timestamp}, ...]
 
-            // 关键修改：将获取到的历史记录保存到conversations数组
-            conversations = historyList;
-            console.log('已同步历史记录到conversations数组，共', conversations.length, '条对话');
+          // 关键修改：将获取到的历史记录保存到conversations数组
+          conversations = historyList;
+          console.log(
+            "已同步历史记录到conversations数组，共",
+            conversations.length,
+            "条对话"
+          );
 
-            // 同时保存到本地存储，确保刷新后可用
-            if (isLoggedIn && currentUser) {
-                const storageKey = `user_${currentUser.id}_conversations`;
-                localStorage.setItem(storageKey, JSON.stringify(conversations));
-            }
+          // 同时保存到本地存储，确保刷新后可用
+          if (isLoggedIn && currentUser) {
+            const storageKey = `user_${currentUser.id}_conversations`;
+            localStorage.setItem(storageKey, JSON.stringify(conversations));
+          }
 
-            const listContainer = document.getElementById('conversationsList');
-            const messageContainer = document.getElementById('messageContainer');
-            // messageContainer.innerHTML = '';
-            listContainer.innerHTML = '';
+          const listContainer = document.getElementById("conversationsList");
+          const messageContainer = document.getElementById("messageContainer");
+          // messageContainer.innerHTML = '';
+          listContainer.innerHTML = "";
 
-            if (historyList.length === 0) {
-                listContainer.innerHTML = `
+          if (historyList.length === 0) {
+            listContainer.innerHTML = `
                     <div class="text-center text-text-tertiary text-sm py-8">
                     暂无历史对话
                     </div>
                 `;
 
-                messageContainer.innerHTML = `
+            messageContainer.innerHTML = `
       <div class="text-center text-text-tertiary text-sm py-4">
         该对话没有消息记录
       </div>
     `;
-                createNewConversation();
+            createNewConversation();
 
-                return;
+            return;
+          }
 
+          historyList.forEach((item) => {
+            const historyItem = document.createElement("div");
+            // 添加active类来标识当前选中的对话
+            const isActive = currentConversationId === item.id;
+            historyItem.className = `p-3 rounded-lg hover:bg-neutral cursor-pointer transition-colors mb-1 ${
+              isActive ? "bg-primary/10" : ""
+            }`;
+
+            // 确定显示的标题
+            let titleText = item.title;
+            if (!titleText && item.messages && item.messages.length > 0) {
+              titleText = item.messages[0].content || "未命名对话";
+            } else if (!titleText) {
+              titleText = "未命名对话";
             }
 
-            historyList.forEach(item => {
-                const historyItem = document.createElement('div');
-                // 添加active类来标识当前选中的对话
-                const isActive = currentConversationId === item.id;
-                historyItem.className = `p-3 rounded-lg hover:bg-neutral cursor-pointer transition-colors mb-1 ${isActive ? 'bg-primary/10' : ''}`;
+            // 截断长标题
+            if (titleText.length > 20) {
+              titleText = titleText.substring(0, 20) + "...";
+            }
 
-                // 确定显示的标题
-                let titleText = item.title;
-                if (!titleText && item.messages && item.messages.length > 0) {
-                    titleText = item.messages[0].content || '未命名对话';
-                } else if (!titleText) {
-                    titleText = '未命名对话';
-                }
-
-                // 截断长标题
-                if (titleText.length > 20) {
-                    titleText = titleText.substring(0, 20) + '...';
-                }
-
-                historyItem.innerHTML = `
+            historyItem.innerHTML = `
         <div class="text-sm font-medium truncate">${titleText}</div>
         <div class="text-xs text-text-tertiary mt-1">
           ${new Date(item.timestamp).toLocaleString()}
         </div>
       `;
-                // if (item.id === currentConversationId) {
-                //     historyItem.classList.add('bg-blue-100'); // 高亮当前会话
-                // }
+            // if (item.id === currentConversationId) {
+            //     historyItem.classList.add('bg-blue-100'); // 高亮当前会话
+            // }
 
-                // 点击加载该历史对话详情
-                historyItem.addEventListener('click', () => {
-                    // 点击时更新当前对话ID
-                    currentConversationId = item.id;
-                    loadHistoryDetail(item);
+            // 点击加载该历史对话详情
+            historyItem.addEventListener("click", () => {
+              // 点击时更新当前对话ID
+              currentConversationId = item.id;
+              loadHistoryDetail(item);
 
-                    // loadConversation(currentConversationId);
+              // loadConversation(currentConversationId);
 
-                    // 重新渲染列表以更新选中状态
-                    renderConversationsList();
-                });
-
-                listContainer.appendChild(historyItem);
+              // 重新渲染列表以更新选中状态
+              renderConversationsList();
             });
 
-            // 初始化时，如果有历史对话且没有当前选中的对话，默认选中第一个
-            if (historyList.length > 0 && (!currentConversationId || !conversations.some(c => c.id === currentConversationId))) {
-                currentConversationId = historyList[0].id;
-                console.log('当前对话id', currentConversationId);
-                loadConversation(currentConversationId);
-                //loadHistoryDetail(historyList[0]);
-            }
+            listContainer.appendChild(historyItem);
+          });
 
+          // 初始化时，如果有历史对话且没有当前选中的对话，默认选中第一个
+          if (
+            historyList.length > 0 &&
+            (!currentConversationId ||
+              !conversations.some((c) => c.id === currentConversationId))
+          ) {
+            currentConversationId = historyList[0].id;
+            console.log("当前对话id", currentConversationId);
+            loadConversation(currentConversationId);
+            //loadHistoryDetail(historyList[0]);
+          }
         } catch (err) {
-            console.error('获取历史失败:', err);
+          console.error("获取历史失败:", err);
         }
-    }
+      }
 
-    // 修改loadHistoryDetail函数，确保更新当前对话ID
-    function loadHistoryDetail(conversation) {
+      // 修改loadHistoryDetail函数，确保更新当前对话ID
+      function loadHistoryDetail(conversation) {
         // 保存当前对话ID
         currentConversationId = conversation.id;
 
-        const messageContainer = document.getElementById('messageContainer');
+        const messageContainer = document.getElementById("messageContainer");
         // 清空当前对话
-        messageContainer.innerHTML = '';
+        messageContainer.innerHTML = "";
 
         // 遍历所有消息并添加到DOM
         if (conversation.messages && conversation.messages.length > 0) {
-            conversation.messages.forEach(message => {
-                // 创建消息元素容器
-                /**  const messageElement = document.createElement('div');
+          conversation.messages.forEach((message) => {
+            // 创建消息元素容器
+            /**  const messageElement = document.createElement('div');
                  messageElement.className = `message-item ${message.role}`;
                  **/
-                addMessageToDOM(
-                    message.role,
-                    message.content,
-                    message.timestamp,
-                    message.thinking || '',
-                    message.documents || [],
-                );
-                // 创建语音控制区域
-                /**const audioControl = document.createElement('div');
+            addMessageToDOM(
+              message.role,
+              message.content,
+              message.timestamp,
+              message.thinking || "",
+              message.documents || []
+            );
+            // 创建语音控制区域
+            /**const audioControl = document.createElement('div');
                  audioControl.className = 'audio-controls mt-2';
                  if (message.role === 'system') {
                         // 初始化语音按钮
@@ -712,207 +790,213 @@
                  // 将消息元素添加到容器
                  messageContainer.appendChild(messageElement);
                  **/
-
-
-            });
+          });
         } else {
-            // 如果没有消息，显示提示
-            messageContainer.innerHTML = `
+          // 如果没有消息，显示提示
+          messageContainer.innerHTML = `
       <div class="text-center text-text-tertiary text-sm py-4">
         该对话没有消息记录
       </div>
     `;
         }
-    }
+      }
 
-    // 在initApp中确保调用loadHistory
-    function initApp() {
+      // 在initApp中确保调用loadHistory
+      function initApp() {
         // 恢复登录状态
-        const savedUser = localStorage.getItem('currentUser');
-        const token = localStorage.getItem('currentUser_token');
+        const savedUser = localStorage.getItem("currentUser");
+        const token = localStorage.getItem("currentUser_token");
 
         if (savedUser && token) {
-            currentUser = JSON.parse(savedUser);
-            isLoggedIn = true;
-            console.log('已恢复登录状态:', currentUser);
-            console.log('sidebar', sidebar);
-            // 加载历史记录（会自动同步到conversations）
-            // loadHistory();
+          currentUser = JSON.parse(savedUser);
+          isLoggedIn = true;
+          console.log("已恢复登录状态:", currentUser);
+          console.log("sidebar", sidebar);
+          // 加载历史记录（会自动同步到conversations）
+          // loadHistory();
         } else {
-            currentUser = null;
-            isLoggedIn = false;
-            console.log('未检测到登录状态');
-            console.log('sidebar', sidebar);
-            // 加载匿名对话
-            loadAnonymousConversation();
+          currentUser = null;
+          isLoggedIn = false;
+          console.log("未检测到登录状态");
+          console.log("sidebar", sidebar);
+          // 加载匿名对话
+          loadAnonymousConversation();
         }
-    }
+      }
 
+      // 添加登录按钮事件
+      document.getElementById("loginBtn").addEventListener("click", () => {
+        loginModal.classList.remove("hidden");
+      });
 
-    // 添加登录按钮事件
-    document.getElementById('loginBtn').addEventListener('click', () => {
-        loginModal.classList.remove('hidden');
-    });
-
-    controlSide.addEventListener('click', () => {
-
-        const icon = controlSide.querySelector('i');
+      controlSide.addEventListener("click", () => {
+        const icon = controlSide.querySelector("i");
 
         isSide = !isSide;
         if (isSide) {
-            console.log('展开');
-            sidebar.classList.remove('hidden');
-            icon.classList.remove('fa-chevron-right');
-            icon.classList.add('fa-chevron-left');
-            controlSide.classList.add('sidebar-open');
+          console.log("展开");
+          sidebar.classList.remove("hidden");
+          icon.classList.remove("fa-chevron-right");
+          icon.classList.add("fa-chevron-left");
+          controlSide.classList.add("sidebar-open");
         } else if (!isSide) {
-            sidebar.classList.add('hidden');
-            icon.classList.remove('fa-chevron-left');
-            icon.classList.add('fa-chevron-right');
-            controlSide.classList.remove('sidebar-open');
-            console.log('关掉');
+          sidebar.classList.add("hidden");
+          icon.classList.remove("fa-chevron-left");
+          icon.classList.add("fa-chevron-right");
+          controlSide.classList.remove("sidebar-open");
+          console.log("关掉");
         }
+      });
 
-
-    });
-
-
-    function initConversations() {
+      function initConversations() {
         if (isLoggedIn && currentUser) {
-            const saved = localStorage.getItem(`conversations_${currentUser.username}`);
-            if (saved) conversations = JSON.parse(saved);
+          const saved = localStorage.getItem(
+            `conversations_${currentUser.username}`
+          );
+          if (saved) conversations = JSON.parse(saved);
         } else {
-            const saved = localStorage.getItem('anonymous_conversations');
-            if (saved) conversations = JSON.parse(saved);
+          const saved = localStorage.getItem("anonymous_conversations");
+          if (saved) conversations = JSON.parse(saved);
         }
         // 渲染历史对话到界面
+      }
 
-    }
-
-    // 添加匿名会话处理
-    function loadAnonymousConversation() {
+      // 添加匿名会话处理
+      function loadAnonymousConversation() {
         // 从本地存储加载匿名会话
-        const anonymousConv = localStorage.getItem('anonymous_conversations');
-        console.log('我是匿名');
-        console.log('sidebar', sidebar);
+        const anonymousConv = localStorage.getItem("anonymous_conversations");
+        console.log("我是匿名");
+        console.log("sidebar", sidebar);
         if (anonymousConv) {
-            conversations = JSON.parse(anonymousConv);
+          conversations = JSON.parse(anonymousConv);
 
-            currentConversationId = conversations[0].id;
-            console.log('当前对话id', currentConversationId);
-            loadConversation(currentConversationId);
-            console.log('sidebar', sidebar);
+          currentConversationId = conversations[0].id;
+          console.log("当前对话id", currentConversationId);
+          loadConversation(currentConversationId);
+          console.log("sidebar", sidebar);
         } else {
-            // 创建新的匿名会话
-            createNewConversation();
+          // 创建新的匿名会话
+          createNewConversation();
         }
         renderConversationsList();
-    }
+      }
 
-
-    // 加载历史对话
-    function loadConversations() {
+      // 加载历史对话
+      function loadConversations() {
         if (isLoggedIn && currentUser) {
-            console.log('加载不不不')
-            loadHistory();
+          console.log("加载不不不");
+          loadHistory();
         } else {
-            console.log('加载你们')
-            // 未登录状态 - 加载匿名会话
-            loadAnonymousConversation();
+          console.log("加载你们");
+          // 未登录状态 - 加载匿名会话
+          loadAnonymousConversation();
         }
+      }
 
-    }
+      // 渲染对话列表
 
-    // 渲染对话列表
-
-    function renderConversationsList() {
-
-
-        console.log('渲染对话列表', conversations);
-        console.log('sidebar', sidebar);
+      function renderConversationsList() {
+        console.log("渲染对话列表", conversations);
+        console.log("sidebar", sidebar);
 
         if (conversations.length === 0) {
-            conversationsList.innerHTML = `
+          conversationsList.innerHTML = `
                     <div class="text-center text-text-tertiary text-sm py-8">
                         暂无历史对话
                     </div>
                 `;
-            return;
+          return;
         }
 
-        conversationsList.innerHTML = '';
+        conversationsList.innerHTML = "";
 
-        conversations.forEach(conv => {
-            const btn = document.createElement('div');
-            const isActive = currentConversationId === conv.id;
-            btn.className = `p-3 rounded-lg hover:bg-neutral cursor-pointer transition-colors mb-1 ${isActive ? 'bg-primary/10' : ''}`;
+        conversations.forEach((conv) => {
+          const btn = document.createElement("div");
+          const isActive = currentConversationId === conv.id;
+          btn.className = `p-3 rounded-lg hover:bg-neutral cursor-pointer transition-colors mb-1 ${
+            isActive ? "bg-primary/10" : ""
+          }`;
 
-            btn.textContent = conv.title;
-            let titleText = conv.title;
-            btn.innerHTML = `
+          btn.textContent = conv.title;
+          let titleText = conv.title;
+          btn.innerHTML = `
                     <div class="text-sm font-medium truncate">${titleText}</div>
                     <div class="text-xs text-text-tertiary mt-1">
                         ${new Date(conv.timestamp).toLocaleString()}
                     </div>
                 `;
-            if (conv.id === currentConversationId) {
-                console.log('高亮当前会话', conv.id);
-                btn.classList.add('bg-blue-100'); // 高亮当前会话
-            }
-            btn.addEventListener('click', () => {
-                currentConversationId = conv.id;
-                console.log('点击了对话列表', conv.id);
-                loadConversation(conv.id);
-            });
-            conversationsList.appendChild(btn);
-        })
+          if (conv.id === currentConversationId) {
+            console.log("高亮当前会话", conv.id);
+            btn.classList.add("bg-blue-100"); // 高亮当前会话
+          }
+          btn.addEventListener("click", () => {
+            currentConversationId = conv.id;
+            console.log("点击了对话列表", conv.id);
+            loadConversation(conv.id);
+          });
+          conversationsList.appendChild(btn);
+        });
 
         loadHistory();
+      }
 
-    };
-
-
-    // 加载指定对话
-    function loadConversation(convId) {
+      // 加载指定对话
+      function loadConversation(convId) {
         currentConversationId = convId;
 
-        const conversation = conversations.find(conv => conv.id === convId);
+        const conversation = conversations.find((conv) => conv.id === convId);
 
-        console.log('loadConversation', conversation, 'convId', convId);
+        console.log("loadConversation", conversation, "convId", convId);
         if (conversation) {
-            // 清空当前消息区域
-            messageContainer.innerHTML = '';
-            // 渲染该对话的所有消息
-            conversation.messages.forEach(msg => {
-                addMessageToDOM(msg.role, msg.content, msg.timestamp, msg.thinking, msg.documents);
-            });
-
-
+          // 清空当前消息区域
+          messageContainer.innerHTML = "";
+          // 渲染该对话的所有消息
+          conversation.messages.forEach((msg) => {
+            addMessageToDOM(
+              msg.role,
+              msg.content,
+              msg.timestamp,
+              msg.thinking,
+              msg.documents
+            );
+          });
         }
 
         loadHistory();
-    }
+      }
 
-
-    function addMessageToDOM(role, content, timestamp, thinkContent = '', documents = []) {
-
-
+      function addMessageToDOM(
+        role,
+        content,
+        timestamp,
+        thinkContent = "",
+        documents = []
+      ) {
         const messageId = `msg-${Date.now()}`;
-        const isUser = role === 'user';
+        const isUser = role === "user";
         // 获取头像和下拉框元素
 
-
-        const messageEl = document.createElement('div');
-        messageEl.className = `animate-fade-in ${isUser ? 'flex justify-end' : ''}`;
+        const messageEl = document.createElement("div");
+        messageEl.className = `animate-fade-in ${
+          isUser ? "flex justify-end" : ""
+        }`;
 
         // 修改messageEl.innerHTML部分的样式
         messageEl.innerHTML = `
-                <div class="max-w-[95%] mx-2 my-3 ${isUser ? 'ml-auto' : ''}">
-                    <div class="relative flex ${isUser ? 'flex-row-reverse' : ''} items-start">
+                <div class="max-w-[95%] mx-2 my-3 ${isUser ? "ml-auto" : ""}">
+                    <div class="relative flex ${
+                      isUser ? "flex-row-reverse" : ""
+                    } items-start">
                         <!-- 头像部分 -->
-                        <div class="voiceToggle w-10 h-10 rounded-full ${isUser ? 'bg-secondary text-primary' : 'bg-primary text-white'}
+                        <div class="voiceToggle w-10 h-10 rounded-full ${
+                          isUser
+                            ? "bg-secondary text-primary"
+                            : "bg-primary text-white"
+                        }
                                     flex items-center justify-center flex-shrink-0 shadow-sm">
-                            <i class="fa ${isUser ? 'fa-user' : 'fa-robot'}"></i>
+                            <i class="fa ${
+                              isUser ? "fa-user" : "fa-robot"
+                            }"></i>
                         </div>
 
                         <!-- 语音选择下拉框 -->
@@ -923,15 +1007,29 @@
 
 
                         <!-- 消息内容区域 -->
-                        <div class="${isUser ? 'mr-3 ml-0' : 'ml-3 mr-0'} flex-1 min-w-0">
-                            <div class="bg-white p-4 rounded-2xl shadow-card ${isUser ? 'bg-secondary text-gray-800' : 'bg-gray-50 text-gray-800'}
-                                        border ${isUser ? 'border-secondary/30' : 'border-gray-100'}">
+                        <div class="${
+                          isUser ? "mr-3 ml-0" : "ml-3 mr-0"
+                        } flex-1 min-w-0">
+                            <div class="bg-white p-4 rounded-2xl shadow-card ${
+                              isUser
+                                ? "bg-secondary text-gray-800"
+                                : "bg-gray-50 text-gray-800"
+                            }
+                                        border ${
+                                          isUser
+                                            ? "border-secondary/30"
+                                            : "border-gray-100"
+                                        }">
 
-                                ${thinkContent ? `
+                                ${
+                                  thinkContent
+                                    ? `
                                     <div class="text-gray-500 text-sm mb-2 italic think-content">
                                         ${marked.parse(thinkContent)}
                                     </div>
-                                ` : ''}
+                                `
+                                    : ""
+                                }
 
                                 <div id="${messageId}" class="text-balance break-words leading-relaxed">
                                     ${marked.parse(content)}
@@ -943,397 +1041,417 @@
                             </div>
 
                             <!-- 时间戳（新增） -->
-                            <div class="text-xs text-gray-400 mt-1 ${isUser ? 'text-right pr-1' : 'pl-1'}">
-                                ${new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                            <div class="text-xs text-gray-400 mt-1 ${
+                              isUser ? "text-right pr-1" : "pl-1"
+                            }">
+                                ${new Date(timestamp).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
                             </div>
                         </div>
                     </div>
                 </div>
             `;
 
-
-        const audioControl = document.createElement('div');
-        audioControl.className = 'audio-controls mt-2';
-        if (role === 'system') {
-            // 初始化语音按钮
-            const fullText = (thinkContent || '') + (content || '');
-            // 使用语音模块初始化控制按钮
-            SpeechPlayer.initAudioControls(audioControl, fullText);
-
+        const audioControl = document.createElement("div");
+        audioControl.className = "audio-controls mt-2";
+        if (role === "system") {
+          // 初始化语音按钮
+          const fullText = (thinkContent || "") + (content || "");
+          // 使用语音模块初始化控制按钮
+          SpeechPlayer.initAudioControls(audioControl, fullText);
         }
-
 
         // 将语音控制添加到消息元素
         messageEl.appendChild(audioControl);
 
-
-        const docLinksContainer = messageEl.querySelector('.doc-links');
-        documents.forEach(doc => {
-
-            const docLink = document.createElement('a');
-            docLink.href = `/download_doc/${doc.datasetId}/${doc.documentId}/${doc.documentName}`;
-            docLink.className = 'inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded m-1';
-            docLink.textContent = doc.documentName;
-            docLink.target = '_blank';
-            docLinksContainer.appendChild(docLink);
-        })
+        const docLinksContainer = messageEl.querySelector(".doc-links");
+        documents.forEach((doc) => {
+          const docLink = document.createElement("a");
+          docLink.href = `/download_doc/${doc.datasetId}/${doc.documentId}/${doc.documentName}`;
+          docLink.className =
+            "inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded m-1";
+          docLink.textContent = doc.documentName;
+          docLink.target = "_blank";
+          docLinksContainer.appendChild(docLink);
+        });
 
         messageContainer.appendChild(messageEl);
         messageContainer.scrollTop = messageContainer.scrollHeight;
         // ✅ 绑定朗读按钮事件
+      }
 
-    }
+      // 保存对话到本地存
 
-    // 保存对话到本地存
-
-    async function saveConversations() {
-        const currentConv = conversations.find(c => c.id === currentConversationId);
-        console.log('保存对话', currentConv);
+      async function saveConversations() {
+        const currentConv = conversations.find(
+          (c) => c.id === currentConversationId
+        );
+        console.log("保存对话", currentConv);
         if (!currentConv) {
-            console.log('未找到当前对话，不保存');
-            return;
+          console.log("未找到当前对话，不保存");
+          return;
         }
 
         if (isLoggedIn && currentUser) {
-            try {
-                const token = localStorage.getItem('currentUser_token');
-                if (!token) return;
+          try {
+            const token = localStorage.getItem("currentUser_token");
+            if (!token) return;
 
-                // 直接发送整个对话对象
-                const response = await fetch('/save_history', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(currentConv)   // 👈 直接发送当前会话
-                });
+            // 直接发送整个对话对象
+            const response = await fetch("/save_history", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(currentConv), // 👈 直接发送当前会话
+            });
 
-                if (!response.ok) throw new Error('保存历史失败');
-                console.log('历史保存成功');
-            } catch (err) {
-                console.error('保存历史出错:', err);
-            }
+            if (!response.ok) throw new Error("保存历史失败");
+            console.log("历史保存成功");
+          } catch (err) {
+            console.error("保存历史出错:", err);
+          }
 
-            // 同时保存到本地（备份）
-            localStorage.setItem(`conversations_${currentUser.username}`, JSON.stringify(conversations));
+          // 同时保存到本地（备份）
+          localStorage.setItem(
+            `conversations_${currentUser.username}`,
+            JSON.stringify(conversations)
+          );
         } else {
-            // 未登录状态 - 只保存到 localStorage
-            localStorage.setItem('anonymous_conversations', JSON.stringify(conversations));
-            console.log("保存未登录历史数据");
+          // 未登录状态 - 只保存到 localStorage
+          localStorage.setItem(
+            "anonymous_conversations",
+            JSON.stringify(conversations)
+          );
+          console.log("保存未登录历史数据");
         }
-    }
+      }
 
-
-    // 更新对话标题（使用第一条消息）
-    function updateConversationTitle(firstMessage) {
-        const convIndex = conversations.findIndex(c => c.id === currentConversationId);
+      // 更新对话标题（使用第一条消息）
+      function updateConversationTitle(firstMessage) {
+        const convIndex = conversations.findIndex(
+          (c) => c.id === currentConversationId
+        );
         if (convIndex === -1) return;
 
         // 截取前20个字符作为标题
-        conversations[convIndex].title = firstMessage.length > 20
-            ? firstMessage.substring(0, 20) + '...'
+        conversations[convIndex].title =
+          firstMessage.length > 20
+            ? firstMessage.substring(0, 20) + "..."
             : firstMessage;
         conversations[convIndex].timestamp = new Date().toISOString();
         saveConversations();
         renderConversationsList();
-    }
+      }
 
+      // 1. 获取元素和定义常量
 
-    // 1. 获取元素和定义常量
+      const MAX_HEIGHT = 150; // 最大高度150px（可按需改）
 
-    const MAX_HEIGHT = 150; // 最大高度150px（可按需改）
-
-    // 2. 核心函数：调整textarea高度
-    function adjustTextareaHeight() {
+      // 2. 核心函数：调整textarea高度
+      function adjustTextareaHeight() {
         // 第一步：先重置高度为auto，才能准确获取内容实际高度
-        transcriptInput.style.height = 'auto';
+        transcriptInput.style.height = "auto";
 
         // 第二步：计算3个关键高度
         const contentHeight = transcriptInput.scrollHeight; // 内容实际高度（有多少内容就多高）
         const minHeight = transcriptInput.rows * 24; // 最小高度（基于rows计算，24是行高估算值，可微调）
-        const targetHeight = Math.min(  // 取“内容高度”和“最大高度”的较小值（避免超过150px）
-            Math.max(contentHeight, minHeight), // 取“内容高度”和“最小高度”的较大值（避免比初始高度还小）
-            MAX_HEIGHT
+        const targetHeight = Math.min(
+          // 取“内容高度”和“最大高度”的较小值（避免超过150px）
+          Math.max(contentHeight, minHeight), // 取“内容高度”和“最小高度”的较大值（避免比初始高度还小）
+          MAX_HEIGHT
         );
 
         // 第三步：设置最终高度，超过最大高度就显示滚动条
         transcriptInput.style.height = `${targetHeight}px`;
-        transcriptInput.style.overflowY = targetHeight >= MAX_HEIGHT ? 'auto' : 'hidden';
-    }
+        transcriptInput.style.overflowY =
+          targetHeight >= MAX_HEIGHT ? "auto" : "hidden";
+      }
 
-    // 3. 触发时机：输入内容时实时调整
-    transcriptInput.addEventListener('input', () => {
+      // 3. 触发时机：输入内容时实时调整
+      transcriptInput.addEventListener("input", () => {
         adjustTextareaHeight(); // 输入文字/删除文字时，立即调整高度
 
         updateInputState();
-    });
+      });
 
-    // 初始化输入状态
-    function updateInputState() {
+      // 初始化输入状态
+      function updateInputState() {
         const textLen = transcriptInput.value.trim().length;
         // 更新字数统计
 
         // 控制清空按钮显示（文本非空时显示）
         if (textLen > 0) {
-            clearTranscriptBtn.classList.remove('opacity-0', 'invisible');
-            clearTranscriptBtn.classList.add('opacity-100', 'visible');
-            askBtn.disabled = false; // 有文本则启用“获取答案”
+          clearTranscriptBtn.classList.remove("opacity-0", "invisible");
+          clearTranscriptBtn.classList.add("opacity-100", "visible");
+          askBtn.disabled = false; // 有文本则启用“获取答案”
         } else {
-            clearTranscriptBtn.classList.add('opacity-0', 'invisible');
-            clearTranscriptBtn.classList.remove('opacity-100', 'visible');
+          clearTranscriptBtn.classList.add("opacity-0", "invisible");
+          clearTranscriptBtn.classList.remove("opacity-100", "visible");
         }
-    }
+      }
 
-    // 清空文本按钮逻辑
-    clearTranscriptBtn.addEventListener('click', () => {
-        transcriptInput.value = '';
+      // 清空文本按钮逻辑
+      clearTranscriptBtn.addEventListener("click", () => {
+        transcriptInput.value = "";
         updateInputState();
         statusEl.textContent = "已清空输入文本";
         adjustTextareaHeight();
-    });
-    // 4. 初始化：页面加载时先执行一次，确保初始高度正确
-    adjustTextareaHeight();
+      });
+      // 4. 初始化：页面加载时先执行一次，确保初始高度正确
+      adjustTextareaHeight();
 
+      function updateUIForLogin() {
+        loginModal.classList.add("hidden");
+        document
+          .getElementById("newConversationBtn")
+          .classList.remove("hidden");
 
-    function updateUIForLogin() {
-        loginModal.classList.add('hidden');
-        document.getElementById('newConversationBtn').classList.remove('hidden');
-
-        currentUsername.textContent = localStorage.getItem('currentUser');
-        userInfo.classList.remove('hidden');
-        document.getElementById('loginBtn').classList.add('hidden');
+        currentUsername.textContent = localStorage.getItem("currentUser");
+        userInfo.classList.remove("hidden");
+        document.getElementById("loginBtn").classList.add("hidden");
         loadConversations();
         // 启用系统功能
         transcriptInput.disabled = false;
         startBtn.disabled = false;
         clearTranscriptBtn.disabled = false;
-        statusEl.textContent = "请点击\"开始录音\"按钮输入您的问题";
+        statusEl.textContent = '请点击"开始录音"按钮输入您的问题';
 
         // 创建新对话
+      }
 
-    }
-
-    // 设置事件监听器
-    function setupEventListeners() {
+      // 设置事件监听器
+      function setupEventListeners() {
         // 录音控制
-        startBtn.addEventListener('click', startRecording);
-        stopBtn.addEventListener('click', stopRecording);
-        askBtn.addEventListener('click', getAnswer);
-        logoutBtn.addEventListener('click', logout);
+        startBtn.addEventListener("click", startRecording);
+        stopBtn.addEventListener("click", stopRecording);
+        askBtn.addEventListener("click", getAnswer);
+        logoutBtn.addEventListener("click", logout);
 
         // 监听文本输入事件
-        transcriptInput.addEventListener('input', handleTextInput);
-
+        transcriptInput.addEventListener("input", handleTextInput);
 
         // 登录表单提交
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+        loginForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
 
-            try {
+          try {
+            const response = await fetch("/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, password }),
+            });
 
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username, password})
-                });
+            const result = await response.json();
 
-                const result = await response.json();
-
-
-                if (result.success) {
-
-                    localStorage.setItem('currentUser_token', result.token);
-                    localStorage.setItem('currentUser', JSON.stringify(username));
-                    localStorage.setItem('isLoggedIn', 'true');
-                    currentUser = {username: username};
-                    isLoggedIn = true;
-                    console.log('登录成功isloggedin', isLoggedIn)
-                    updateUIForLogin();
-                    // loadHistory();
-
-                }
-
-
-            } catch (error) {
-                alert('网络错误，请稍后重试');
+            if (result.success) {
+              localStorage.setItem("currentUser_token", result.token);
+              localStorage.setItem("currentUser", JSON.stringify(username));
+              localStorage.setItem("isLoggedIn", "true");
+              currentUser = { username: username };
+              isLoggedIn = true;
+              console.log("登录成功isloggedin", isLoggedIn);
+              updateUIForLogin();
+              // loadHistory();
             }
+          } catch (error) {
+            alert("网络错误，请稍后重试");
+          }
         });
 
         // 消息复制功能
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.copy-btn')) {
-                const btn = e.target.closest('.copy-btn');
-                const messageId = btn.getAttribute('data-id');
-                const messageEl = document.getElementById(messageId);
-                const textContent = messageEl.querySelector('.text-balance').textContent;
+        document.addEventListener("click", (e) => {
+          if (e.target.closest(".copy-btn")) {
+            const btn = e.target.closest(".copy-btn");
+            const messageId = btn.getAttribute("data-id");
+            const messageEl = document.getElementById(messageId);
+            const textContent =
+              messageEl.querySelector(".text-balance").textContent;
 
-                navigator.clipboard.writeText(textContent).then(() => {
-                    const originalIcon = btn.innerHTML;
-                    btn.innerHTML = '<i class="fa fa-check"></i>';
-                    setTimeout(() => {
-                        btn.innerHTML = originalIcon;
-                    }, 2000);
-                });
-            }
+            navigator.clipboard.writeText(textContent).then(() => {
+              const originalIcon = btn.innerHTML;
+              btn.innerHTML = '<i class="fa fa-check"></i>';
+              setTimeout(() => {
+                btn.innerHTML = originalIcon;
+              }, 2000);
+            });
+          }
         });
 
         // 语音播放按钮事件委托
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.speak-btn')) {
-                const btn = e.target.closest('.speak-btn');
-                const text = btn.getAttribute('data-text');
-
-            }
+        document.addEventListener("click", (e) => {
+          if (e.target.closest(".speak-btn")) {
+            const btn = e.target.closest(".speak-btn");
+            const text = btn.getAttribute("data-text");
+          }
         });
-    }
+      }
 
+      // 录音相关变量（状态管理）
+      let mediaRecorder; // 录音控制器对象
+      let audioChunks = []; // 存储录音的二进制数据片段
+      let recordingMimeType; // 保存当前录音的MIME类型
 
-    // 录音相关变量（状态管理）
-    let mediaRecorder;       // 录音控制器对象
-    let audioChunks = [];    // 存储录音的二进制数据片段
-    let recordingMimeType; // 保存当前录音的MIME类型
-
-    // 处理文本输入
-    function handleTextInput() {
+      // 处理文本输入
+      function handleTextInput() {
         const inputText = transcriptInput.value.trim();
         // 根据输入内容是否为空启用/禁用获取答案按钮
         askBtn.disabled = inputText.length === 0;
 
         // 更新状态提示
         if (inputText.length > 0) {
-            statusEl.textContent = "点击\"获取答案\"按钮提交问题";
+          statusEl.textContent = '点击"获取答案"按钮提交问题';
         } else {
-            statusEl.textContent = "请输入文本或点击\"开始录音\"按钮";
+          statusEl.textContent = '请输入文本或点击"开始录音"按钮';
         }
-    }
+      }
 
-    // 开始录音
-    async function startRecording() {
+      // 开始录音
+      async function startRecording() {
         try {
-            // 清空输入框
-            transcriptInput.value = '';
-            const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+          // 清空输入框
+          transcriptInput.value = "";
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
 
-            // 尝试使用浏览器支持的最佳音频格式
-            const audioFormats = [
-                {mimeType: 'audio/wav;codecs=1'},
-                {mimeType: 'audio/mpeg'},
-                {mimeType: 'audio/wav'},
-                {mimeType: 'audio/mp3'},
-            ];
+          // 尝试使用浏览器支持的最佳音频格式
+          const audioFormats = [
+            { mimeType: "audio/wav;codecs=1" },
+            { mimeType: "audio/mpeg" },
+            { mimeType: "audio/wav" },
+            { mimeType: "audio/mp3" },
+          ];
 
-            // 选择浏览器支持的第一种格式
-            let options = audioFormats.find(fmt => MediaRecorder.isTypeSupported(fmt.mimeType));
-            //fmt自定义的
-            if (!options) {
-                options = {mimeType: 'audio/webm'}; // 最后的fallback
+          // 选择浏览器支持的第一种格式
+          let options = audioFormats.find((fmt) =>
+            MediaRecorder.isTypeSupported(fmt.mimeType)
+          );
+          //fmt自定义的
+          if (!options) {
+            options = { mimeType: "audio/webm" }; // 最后的fallback
+          }
+
+          // 保存实际使用的MIME类型
+          recordingMimeType = options.mimeType;
+          console.log(recordingMimeType);
+          mediaRecorder = new MediaRecorder(stream, options);
+          audioChunks = [];
+          mediaRecorder.start();
+
+          // 添加录音动画
+          startBtn
+            .querySelector("i")
+            .classList.add("recording-pulse", "pulse-ring");
+
+          // 更新UI状态
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+          askBtn.disabled = true;
+          statusEl.textContent =
+            "正在录音...请说话(建议避免使用缩写词，生成文字后需检查校对)";
+
+          // 30秒后自动停止录音
+          setTimeout(() => {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+              stopRecording();
+              statusEl.textContent = "录音已自动停止（超过60秒）";
             }
-
-            // 保存实际使用的MIME类型
-            recordingMimeType = options.mimeType;
-            console.log(recordingMimeType)
-            mediaRecorder = new MediaRecorder(stream, options);
-            audioChunks = [];
-            mediaRecorder.start();
-
-            // 添加录音动画
-            startBtn.querySelector('i').classList.add('recording-pulse', 'pulse-ring');
-
-            // 更新UI状态
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-            askBtn.disabled = true;
-            statusEl.textContent = "正在录音...请说话(建议避免使用缩写词，生成文字后需检查校对)";
-
-            // 30秒后自动停止录音
-            setTimeout(() => {
-                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                    stopRecording();
-                    statusEl.textContent = "录音已自动停止（超过60秒）";
-                }
-            }, 60000);
-
+          }, 60000);
         } catch (error) {
-            console.error('录音失败:', error);
-            statusEl.textContent = `录音权限被拒绝，请允许麦克风访问`;
+          console.error("录音失败:", error);
+          statusEl.textContent = `录音权限被拒绝，请允许麦克风访问`;
         }
-    }
+      }
 
-    // 提取HTML中的纯文本（去除标签）
-    function getPlainText(html) {
-        const tempDiv = document.createElement('div');
+      // 提取HTML中的纯文本（去除标签）
+      function getPlainText(html) {
+        const tempDiv = document.createElement("div");
         tempDiv.innerHTML = html;
-        return tempDiv.textContent || '';
-    }
+        return tempDiv.textContent || "";
+      }
 
+      // 停止录音并发送原始音频数据到后端
+      function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
 
-    // 停止录音并发送原始音频数据到后端
-    function stopRecording() {
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-            mediaRecorder.stop();
+          // 移除录音动画
+          startBtn
+            .querySelector("i")
+            .classList.remove("recording-pulse", "pulse-ring");
 
-            // 移除录音动画
-            startBtn.querySelector('i').classList.remove('recording-pulse', 'pulse-ring');
+          // 停止所有音轨
+          mediaRecorder.stream.getTracks().forEach((track) => track.stop());
 
-            // 停止所有音轨
-            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+          // 更新UI状态
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+          statusEl.textContent = "录音已停止，正在处理...";
 
-            // 更新UI状态
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-            statusEl.textContent = "录音已停止，正在处理...";
+          // 处理录音数据并发送到后端
+          mediaRecorder.addEventListener(
+            "dataavailable",
+            async (event) => {
+              audioChunks.push(event.data);
+              const audioBlob = new Blob(audioChunks, {
+                type: recordingMimeType,
+              });
 
-            // 处理录音数据并发送到后端
-            mediaRecorder.addEventListener('dataavailable', async (event) => {
-                audioChunks.push(event.data);
-                const audioBlob = new Blob(audioChunks, {type: recordingMimeType});
+              try {
+                // 创建FormData并附加音频文件
+                const formData = new FormData();
+                // 提取文件扩展名
+                const fileExt = recordingMimeType.split("/")[1] || "audio";
+                formData.append("audio", audioBlob, `recording.${fileExt}`);
 
-                try {
-                    // 创建FormData并附加音频文件
-                    const formData = new FormData();
-                    // 提取文件扩展名
-                    const fileExt = recordingMimeType.split('/')[1] || 'audio';
-                    formData.append('audio', audioBlob, `recording.${fileExt}`);
+                // 发送原始音频到后端进行处理（包括转WAV）
+                const response = await fetch("/transcribe", {
+                  method: "POST",
+                  body: formData,
+                });
 
-                    // 发送原始音频到后端进行处理（包括转WAV）
-                    const response = await fetch('/transcribe', {
-                        method: 'POST',
-                        body: formData
-                    });
+                const result = await response.json();
+                if (result.error) {
+                  statusEl.textContent = `错误: ${result.error}`;
+                  transcriptInput.value = result.error;
+                } else {
+                  // 提取转录文本
+                  let transcriptText = "";
+                  if (
+                    result.text &&
+                    Array.isArray(result.text) &&
+                    result.text.length > 0
+                  ) {
+                    transcriptText = result.text[0].text || "";
+                    transcriptText = transcriptText.replace(/<\|[^|]+\|>/g, "");
+                  }
 
-                    const result = await response.json();
-                    if (result.error) {
-                        statusEl.textContent = `错误: ${result.error}`;
-                        transcriptInput.value = result.error;
-                    } else {
-                        // 提取转录文本
-                        let transcriptText = "";
-                        if (result.text && Array.isArray(result.text) && result.text.length > 0) {
-                            transcriptText = result.text[0].text || "";
-                            transcriptText = transcriptText.replace(/<\|[^|]+\|>/g, '');
-                        }
-
-                        if (transcriptText) {
-                            transcriptInput.value = transcriptText;
-                            askBtn.disabled = false;
-                        }
-                        statusEl.textContent = "录音已转录，可编辑文本后点击\"获取答案\"";
-                    }
-                } catch (error) {
-                    statusEl.textContent = `处理失败: ${error.message}`;
-                    transcriptInput.value = `处理失败: ${error.message}`;
-                    console.error('音频处理错误:', error);
+                  if (transcriptText) {
+                    transcriptInput.value = transcriptText;
+                    askBtn.disabled = false;
+                  }
+                  statusEl.textContent =
+                    '录音已转录，可编辑文本后点击"获取答案"';
                 }
-            }, {once: true});
+              } catch (error) {
+                statusEl.textContent = `处理失败: ${error.message}`;
+                transcriptInput.value = `处理失败: ${error.message}`;
+                console.error("音频处理错误:", error);
+              }
+            },
+            { once: true }
+          );
         }
-    }
+      }
 
-
-    // 语音朗读模块
-    const SpeechPlayer = {
+      // 语音朗读模块
+      const SpeechPlayer = {
         isSpeaking: false,
         currentUtterance: null,
         stopRequested: false,
@@ -1344,37 +1462,44 @@
 
         // 安全解码函数（不变）
         safeDecodeURIComponent(encodedString) {
-            try {
-                return decodeURIComponent(encodedString);
-            } catch (e) {
-                console.error('URI解码失败:', e);
-                if (typeof encodedString === 'string') {
-                    const sanitized = encodedString.replace(/%(?![0-9A-Fa-f]{2})/g, '%25');
-                    try {
-                        return decodeURIComponent(sanitized);
-                    } catch (e2) {
-                        console.error('修复后仍解码失败:', e2);
-                        return encodedString;
-                    }
-                }
+          try {
+            return decodeURIComponent(encodedString);
+          } catch (e) {
+            console.error("URI解码失败:", e);
+            if (typeof encodedString === "string") {
+              const sanitized = encodedString.replace(
+                /%(?![0-9A-Fa-f]{2})/g,
+                "%25"
+              );
+              try {
+                return decodeURIComponent(sanitized);
+              } catch (e2) {
+                console.error("修复后仍解码失败:", e2);
                 return encodedString;
+              }
             }
+            return encodedString;
+          }
         },
 
         // 初始化语音按钮（不变）
-        initAudioControls(container, textContent = '') {
-            let encodedText = '';
-            try {
-                encodedText = encodeURIComponent(getPlainText(textContent));
-            } catch (e) {
-                console.error('文本编码失败:', e);
-                encodedText = encodeURIComponent(textContent.toString().replace(/[^\x00-\xFF]/g, c =>
-                    '&#' + c.charCodeAt(0) + ';'
-                ));
-            }
-            container.innerHTML = `
+        initAudioControls(container, textContent = "") {
+          let encodedText = "";
+          try {
+            encodedText = encodeURIComponent(getPlainText(textContent));
+          } catch (e) {
+            console.error("文本编码失败:", e);
+            encodedText = encodeURIComponent(
+              textContent
+                .toString()
+                .replace(/[^\x00-\xFF]/g, (c) => "&#" + c.charCodeAt(0) + ";")
+            );
+          }
+          container.innerHTML = `
             <button class="speak-btn inline-flex items-center px-3 py-1.5 bg-secondary text-primary text-sm rounded-lg hover:bg-primary hover:text-white transition-colors"
-                    title="朗读当前内容" data-text="${encodeURIComponent(getPlainText(textContent))}">
+                    title="朗读当前内容" data-text="${encodeURIComponent(
+                      getPlainText(textContent)
+                    )}">
                 <i class="fa fa-play mr-2"></i> 开始朗读
             </button>
             <button class="stop-btn inline-flex items-center px-3 py-1.5 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-danger hover:text-white transition-colors opacity-70 cursor-not-allowed"
@@ -1383,265 +1508,288 @@
             </button>
         `;
 
-            const speakBtn = container.querySelector('.speak-btn');
-            const stopBtn = container.querySelector('.stop-btn');
+          const speakBtn = container.querySelector(".speak-btn");
+          const stopBtn = container.querySelector(".stop-btn");
 
-            speakBtn.addEventListener('click', () => {
-                const text = speakBtn.getAttribute('data-text');
-                this.startSpeech(this.safeDecodeURIComponent(text));
-                console.log('手动开始朗读', this.safeDecodeURIComponent(text));
-            });
+          speakBtn.addEventListener("click", () => {
+            const text = speakBtn.getAttribute("data-text");
+            this.startSpeech(this.safeDecodeURIComponent(text));
+            console.log("手动开始朗读", this.safeDecodeURIComponent(text));
+          });
 
-            stopBtn.addEventListener('click', () => this.stopSpeech());
+          stopBtn.addEventListener("click", () => this.stopSpeech());
 
-            return {speakBtn, stopBtn};
+          return { speakBtn, stopBtn };
         },
 
         // 开始朗读（不变，确保初始片段能启动）
         startSpeech(text, isThinkingMode = false) {
-            if (this.isSpeaking) {
-                this.stopSpeech();
-            }
-            const cleanedText = this.cleanText(text);
-            console.log('清理后的初始朗读文本:', cleanedText);
+          if (this.isSpeaking) {
+            this.stopSpeech();
+          }
+          const cleanedText = this.cleanText(text);
+          console.log("清理后的初始朗读文本:", cleanedText);
 
-            this.stopRequested = false;
-            this.processedLength = 0;
-            this.speechQueue = [cleanedText];
+          this.stopRequested = false;
+          this.processedLength = 0;
+          this.speechQueue = [cleanedText];
 
-            console.log('初始化朗读队列:', this.speechQueue);
-            this.triggerSpeechCheck(isThinkingMode);
+          console.log("初始化朗读队列:", this.speechQueue);
+          this.triggerSpeechCheck(isThinkingMode);
         },
 
         // 停止朗读（不变）
         stopSpeech() {
-            this.stopRequested = true;
-            if (this.currentUtterance) {
-                window.speechSynthesis.cancel();
-                this.currentUtterance = null;
-            }
-            this.speechQueue = [];
-            this.isSpeaking = false;
-            this.processedLength = 0;
-            this.updateAudioButtons();
+          this.stopRequested = true;
+          if (this.currentUtterance) {
+            window.speechSynthesis.cancel();
+            this.currentUtterance = null;
+          }
+          this.speechQueue = [];
+          this.isSpeaking = false;
+          this.processedLength = 0;
+          this.updateAudioButtons();
         },
 
         // 触发语音检查（不变）
         triggerSpeechCheck(isThinkingMode = false) {
-            if (!this.stopRequested && !this.isSpeaking) {
-                this.processSpeechQueue(isThinkingMode);
-            }
+          if (!this.stopRequested && !this.isSpeaking) {
+            this.processSpeechQueue(isThinkingMode);
+          }
         },
 
         // 处理语音队列（不变，确保队列能续接）
         processSpeechQueue(isThinkingMode) {
-            if (this.stopRequested || this.speechQueue.length === 0) return;
+          if (this.stopRequested || this.speechQueue.length === 0) return;
 
-            const textToSpeak = this.speechQueue.shift();
-            console.log('正在朗读:', textToSpeak, '剩余队列长度:', this.speechQueue.length);
+          const textToSpeak = this.speechQueue.shift();
+          console.log(
+            "正在朗读:",
+            textToSpeak,
+            "剩余队列长度:",
+            this.speechQueue.length
+          );
 
-            if (textToSpeak.length > 0) {
-                if (this.currentUtterance) {
-                    window.speechSynthesis.cancel();
-                }
-
-                this.currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
-                this.currentUtterance.lang = 'zh-CN';
-                this.currentUtterance.lang = 'zh';
-
-                // 等待语音库加载
-                const loadVoicesAndApply = () => {
-                    let voices = window.speechSynthesis.getVoices();
-                    if (voices.length === 0) {
-                        setTimeout(loadVoicesAndApply, 300);
-                        return;
-                    }
-
-                    // 优先使用保存的音色
-                    let targetVoice = null;
-                    const savedVoiceIndex = localStorage.getItem("selectedVoice");
-                    if (savedVoiceIndex !== null) {
-                        const savedVoice = voices[parseInt(savedVoiceIndex, 10)];
-                        if (savedVoice) {
-                            targetVoice = savedVoice;
-                            // 中文适配：保存的音色不支持中文则切换
-                            if (!targetVoice.lang.includes('zh') && /[\u4e00-\u9fa5]/.test(textToSpeak)) {
-                                targetVoice = null;
-                            }
-                        }
-                    }
-
-                    // 自动筛选中文语音
-                    if (!targetVoice) {
-                        const chineseVoices = voices.filter(voice =>
-                            voice.lang.includes('zh') || voice.name.includes('中文') || voice.name.includes('Chinese')
-                        );
-                        targetVoice = chineseVoices.length > 0 ? chineseVoices[0] : voices[0];
-                    }
-
-                    this.currentUtterance.voice = targetVoice;
-                    // 思考模式参数
-                    if (isThinkingMode) {
-                        this.currentUtterance.pitch = 1.2;
-                        this.currentUtterance.rate = 0.9;
-                    } else {
-                        this.currentUtterance.pitch = 1.0;
-                        this.currentUtterance.rate = 1.0;
-                    }
-
-                    this.isSpeaking = true;
-                    this.updateAudioButtons();
-                    window.speechSynthesis.speak(this.currentUtterance);
-                };
-
-                loadVoicesAndApply();
-
-                // 朗读结束后续接下一段（关键：确保流式内容能连贯）
-                this.currentUtterance.onend = () => {
-                    if (this.stopRequested) {
-                        this.isSpeaking = false;
-                        this.updateAudioButtons();
-                        return;
-                    }
-                    this.processedLength += textToSpeak.length;
-                    this.isSpeaking = false;
-                    this.updateAudioButtons();
-                    // 立即处理下一段，实现“边生成边读”的连贯感
-                    if (this.speechQueue.length > 0) {
-                        this.processSpeechQueue(isThinkingMode);
-                    }
-                };
-
-                this.currentUtterance.onerror = (err) => {
-                    console.error('语音合成失败:', err);
-                    this.isSpeaking = false;
-                    this.updateAudioButtons();
-                };
+          if (textToSpeak.length > 0) {
+            if (this.currentUtterance) {
+              window.speechSynthesis.cancel();
             }
+
+            this.currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+            this.currentUtterance.lang = "zh-CN";
+            this.currentUtterance.lang = "zh";
+
+            // 等待语音库加载
+            const loadVoicesAndApply = () => {
+              let voices = window.speechSynthesis.getVoices();
+              if (voices.length === 0) {
+                setTimeout(loadVoicesAndApply, 300);
+                return;
+              }
+
+              // 优先使用保存的音色
+              let targetVoice = null;
+              const savedVoiceIndex = localStorage.getItem("selectedVoice");
+              if (savedVoiceIndex !== null) {
+                const savedVoice = voices[parseInt(savedVoiceIndex, 10)];
+                if (savedVoice) {
+                  targetVoice = savedVoice;
+                  // 中文适配：保存的音色不支持中文则切换
+                  if (
+                    !targetVoice.lang.includes("zh") &&
+                    /[\u4e00-\u9fa5]/.test(textToSpeak)
+                  ) {
+                    targetVoice = null;
+                  }
+                }
+              }
+
+              // 自动筛选中文语音
+              if (!targetVoice) {
+                const chineseVoices = voices.filter(
+                  (voice) =>
+                    voice.lang.includes("zh") ||
+                    voice.name.includes("中文") ||
+                    voice.name.includes("Chinese")
+                );
+                targetVoice =
+                  chineseVoices.length > 0 ? chineseVoices[0] : voices[0];
+              }
+
+              this.currentUtterance.voice = targetVoice;
+              // 思考模式参数
+              if (isThinkingMode) {
+                this.currentUtterance.pitch = 1.2;
+                this.currentUtterance.rate = 0.9;
+              } else {
+                this.currentUtterance.pitch = 1.0;
+                this.currentUtterance.rate = 1.0;
+              }
+
+              this.isSpeaking = true;
+              this.updateAudioButtons();
+              window.speechSynthesis.speak(this.currentUtterance);
+            };
+
+            loadVoicesAndApply();
+
+            // 朗读结束后续接下一段（关键：确保流式内容能连贯）
+            this.currentUtterance.onend = () => {
+              if (this.stopRequested) {
+                this.isSpeaking = false;
+                this.updateAudioButtons();
+                return;
+              }
+              this.processedLength += textToSpeak.length;
+              this.isSpeaking = false;
+              this.updateAudioButtons();
+              // 立即处理下一段，实现“边生成边读”的连贯感
+              if (this.speechQueue.length > 0) {
+                this.processSpeechQueue(isThinkingMode);
+              }
+            };
+
+            this.currentUtterance.onerror = (err) => {
+              console.error("语音合成失败:", err);
+              this.isSpeaking = false;
+              this.updateAudioButtons();
+            };
+          }
         },
 
         // 更新按钮状态（不变）
         updateAudioButtons() {
-            const speakBtns = document.querySelectorAll('.speak-btn');
-            const stopBtns = document.querySelectorAll('.stop-btn');
+          const speakBtns = document.querySelectorAll(".speak-btn");
+          const stopBtns = document.querySelectorAll(".stop-btn");
 
-            speakBtns.forEach(btn => {
-                btn.disabled = this.isSpeaking;
-                if (this.isSpeaking) {
-                    btn.classList.add('opacity-70', 'cursor-not-allowed');
-                    btn.classList.remove('hover:bg-primary');
-                } else {
-                    btn.classList.remove('opacity-70', 'cursor-not-allowed');
-                    btn.classList.add('hover:bg-primary');
-                }
-            });
+          speakBtns.forEach((btn) => {
+            btn.disabled = this.isSpeaking;
+            if (this.isSpeaking) {
+              btn.classList.add("opacity-70", "cursor-not-allowed");
+              btn.classList.remove("hover:bg-primary");
+            } else {
+              btn.classList.remove("opacity-70", "cursor-not-allowed");
+              btn.classList.add("hover:bg-primary");
+            }
+          });
 
-            stopBtns.forEach(btn => {
-                btn.disabled = !this.isSpeaking;
-                if (this.isSpeaking) {
-                    btn.classList.remove('opacity-70', 'cursor-not-allowed');
-                    btn.classList.add('hover:bg-danger');
-                } else {
-                    btn.classList.add('opacity-70', 'cursor-not-allowed');
-                    btn.classList.remove('hover:bg-danger');
-                }
-            });
+          stopBtns.forEach((btn) => {
+            btn.disabled = !this.isSpeaking;
+            if (this.isSpeaking) {
+              btn.classList.remove("opacity-70", "cursor-not-allowed");
+              btn.classList.add("hover:bg-danger");
+            } else {
+              btn.classList.add("opacity-70", "cursor-not-allowed");
+              btn.classList.remove("hover:bg-danger");
+            }
+          });
         },
 
         // 清理文本格式（修复：彻底移除HTML标签，避免干扰）
         cleanText(text) {
-            return text
-                .replace(/<[^>]*>/g, ' ') // 彻底移除所有HTML标签（关键）
-                .replace(/#{1,6}\s?/g, ' ')
-                .replace(/\*\*(.*?)\*\*/g, '$1')
-                .replace(/\*(.*?)\*/g, '$1')
-                .replace(/`(.*?)`/g, '$1')
-                .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-                .replace(/\n/g, ' ')
-                .replace(/\s+/g, ' ') // 合并多个空格，避免断句混乱
-                .trim();
+          return text
+            .replace(/<[^>]*>/g, " ") // 彻底移除所有HTML标签（关键）
+            .replace(/#{1,6}\s?/g, " ")
+            .replace(/\*\*(.*?)\*\*/g, "$1")
+            .replace(/\*(.*?)\*/g, "$1")
+            .replace(/`(.*?)`/g, "$1")
+            .replace(/\[(.*?)\]\(.*?\)/g, "$1")
+            .replace(/\n/g, " ")
+            .replace(/\s+/g, " ") // 合并多个空格，避免断句混乱
+            .trim();
         },
 
         // 2. 实时添加内容到朗读队列（核心修改：支持中文标点+低阈值）
         addToSpeechQueue(content, isThinkingMode = false) {
-            if (this.stopRequested) return content;
+          if (this.stopRequested) return content;
 
-            const cleaned = this.cleanText(content);
-            if (cleaned.length === 0) return '';
+          const cleaned = this.cleanText(content);
+          if (cleaned.length === 0) return "";
 
-            // 支持中文标点拆分（。，！？；），按语义拆分成可朗读片段
-            const punctuationRegex = /(?:\.(?=\s|$)|[,!?:;。，！？；](?=\s|$))/;
-            const hasValidPunctuation = punctuationRegex.test(cleaned);
-            const reachedThreshold = cleaned.length >= this.SPEECH_THRESHOLD;
+          // 支持中文标点拆分（。，！？；），按语义拆分成可朗读片段
+          const punctuationRegex = /(?:\.(?=\s|$)|[,!?:;。，！？；](?=\s|$))/;
+          const hasValidPunctuation = punctuationRegex.test(cleaned);
+          const reachedThreshold = cleaned.length >= this.SPEECH_THRESHOLD;
 
-            // 满足“有标点”或“达阈值”就触发朗读
-            if (hasValidPunctuation || reachedThreshold) {
-                let textToAdd = cleaned;
-                let remaining = '';
+          // 满足“有标点”或“达阈值”就触发朗读
+          if (hasValidPunctuation || reachedThreshold) {
+            let textToAdd = cleaned;
+            let remaining = "";
 
-                // 有标点时，按最后一个标点拆分（保留完整语义）
-                if (hasValidPunctuation) {
-                    const lastPunctIndex = cleaned.lastIndexOf(
-                        cleaned.match(punctuationRegex)[0]
-                    ) + 1;
-                    textToAdd = cleaned.substring(0, lastPunctIndex); // 要朗读的片段
-                    remaining = cleaned.substring(lastPunctIndex).trim(); // 剩余内容缓存
-                }
-
-                // 追加到朗读队列，立即触发检查（有内容就朗读）
-                this.speechQueue.push(textToAdd);
-                console.log('追加朗读片段:', textToAdd, '剩余缓存:', remaining);
-                this.triggerSpeechCheck(isThinkingMode);
-
-                return remaining; // 返回剩余内容，继续缓存
+            // 有标点时，按最后一个标点拆分（保留完整语义）
+            if (hasValidPunctuation) {
+              const lastPunctIndex =
+                cleaned.lastIndexOf(cleaned.match(punctuationRegex)[0]) + 1;
+              textToAdd = cleaned.substring(0, lastPunctIndex); // 要朗读的片段
+              remaining = cleaned.substring(lastPunctIndex).trim(); // 剩余内容缓存
             }
 
-            // 未满足条件，返回完整内容继续缓存
-            return cleaned;
-        }
-    };
+            // 追加到朗读队列，立即触发检查（有内容就朗读）
+            this.speechQueue.push(textToAdd);
+            console.log("追加朗读片段:", textToAdd, "剩余缓存:", remaining);
+            this.triggerSpeechCheck(isThinkingMode);
 
-    // 获取答案
+            return remaining; // 返回剩余内容，继续缓存
+          }
 
-    async function getAnswer() {
+          // 未满足条件，返回完整内容继续缓存
+          return cleaned;
+        },
+      };
+
+      // 获取答案
+
+      async function getAnswer() {
         const question = transcriptInput.value.trim();
         if (!question) {
-            statusEl.textContent = "没有可发送的问题";
-            return;
+          statusEl.textContent = "没有可发送的问题";
+          return;
         }
 
-        let currentAnswerMarkdown = '';
-        let thinkCurrentAnswerMarkdown = '';
+        let currentAnswerMarkdown = "";
+        let thinkCurrentAnswerMarkdown = "";
         const conversationId = generateUUID();
 
         const userMessage = {
-            role: 'user',
-            content: question,
-            timestamp: new Date().toISOString()
+          role: "user",
+          content: question,
+          timestamp: new Date().toISOString(),
         };
-        addMessageToDOM(userMessage.role, userMessage.content, userMessage.timestamp,);
+        addMessageToDOM(
+          userMessage.role,
+          userMessage.content,
+          userMessage.timestamp
+        );
 
         // 对话管理逻辑（保持不变）
         if (!currentConversationId) {
-            const newConversation = {
-                id: conversationId,
-                title: question.length > 20 ? question.substring(0, 20) + '...' : question,
-                timestamp: new Date().toISOString(),
-                messages: [userMessage]
-            };
-            conversations.unshift(newConversation);
-            currentConversationId = conversationId;
+          const newConversation = {
+            id: conversationId,
+            title:
+              question.length > 20
+                ? question.substring(0, 20) + "..."
+                : question,
+            timestamp: new Date().toISOString(),
+            messages: [userMessage],
+          };
+          conversations.unshift(newConversation);
+          currentConversationId = conversationId;
         } else {
-            const currentConvIndex = conversations.findIndex(c => c.id === currentConversationId);
-            if (currentConvIndex !== -1) {
-                conversations[currentConvIndex].messages.push(userMessage);
-                if (conversations[currentConvIndex].messages.length === 1) {
-                    conversations[currentConvIndex].title = question.length > 20 ? question.substring(0, 20) + '...' : question;
-                }
-                conversations[currentConvIndex].timestamp = new Date().toISOString();
+          const currentConvIndex = conversations.findIndex(
+            (c) => c.id === currentConversationId
+          );
+          if (currentConvIndex !== -1) {
+            conversations[currentConvIndex].messages.push(userMessage);
+            if (conversations[currentConvIndex].messages.length === 1) {
+              conversations[currentConvIndex].title =
+                question.length > 20
+                  ? question.substring(0, 20) + "..."
+                  : question;
             }
+            conversations[currentConvIndex].timestamp =
+              new Date().toISOString();
+          }
         }
-
 
         const seenDocs = new Set();
         window.currentDocs = [];
@@ -1650,429 +1798,441 @@
         statusEl.textContent = "正在获取答案...";
         askBtn.disabled = true;
         startBtn.disabled = true;
-        loadingIndicator.classList.remove('hidden');
+        loadingIndicator.classList.remove("hidden");
 
-        const thinkEl = document.createElement('div');
-        thinkEl.className = 'system-answer bg-white p-4 rounded-lg mt-2 text-gray-500 text-sm mb-2 italic think-content';
+        const thinkEl = document.createElement("div");
+        thinkEl.className =
+          "system-answer bg-white p-4 rounded-lg mt-2 text-gray-500 text-sm mb-2 italic think-content";
         messageContainer.appendChild(thinkEl);
 
-        const answerEl = document.createElement('div');
-        answerEl.className = 'system-answer bg-white p-4 rounded-lg mt-2';
+        const answerEl = document.createElement("div");
+        answerEl.className = "system-answer bg-white p-4 rounded-lg mt-2";
         messageContainer.appendChild(answerEl);
 
-        const docsEl = document.createElement('div');
-        docsEl.className = 'documents mt-3 text-sm';
+        const docsEl = document.createElement("div");
+        docsEl.className = "documents mt-3 text-sm";
         messageContainer.appendChild(docsEl);
 
         // 语音控制按钮容器
-        const audioControl = document.createElement('div');
-        audioControl.className = 'audio-control mt-3 flex gap-2';
+        const audioControl = document.createElement("div");
+        audioControl.className = "audio-control mt-3 flex gap-2";
         messageContainer.appendChild(audioControl);
 
-
         // 初始化语音播放器
-        const {speakBtn} = SpeechPlayer.initAudioControls(audioControl);
-        let speechCache = '';
+        const { speakBtn } = SpeechPlayer.initAudioControls(audioControl);
+        let speechCache = "";
         let inThinkingMode = false;
-
 
         // 【关键新增】首次自动朗读标记（避免重复触发）
         let hasSimulatedClick = false; // 仅首次收到内容时模拟点击，避免重复
         try {
-            const response = await fetch('/ask', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({question: question})
-            });
+          const response = await fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: question }),
+          });
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
 
-            // 修复思考模式标记判断（使用不同的标记）
-            function processContent(content) {
-                if (content === '<RichMediaReference>start') {  // 进入标记
+          // 修复思考模式标记判断（使用不同的标记）
+          function processContent(content) {
+            if (content === "<RichMediaReference>start") {
+              // 进入标记
+              inThinkingMode = true;
+              console.log("不xiang");
+              return { isMarker: true, processed: "" };
+            }
+            if (content === "<RichMediaReference>end") {
+              // 退出标记
+              inThinkingMode = false;
+              return { isMarker: true, processed: "" };
+            }
+            return {
+              isMarker: false,
+              processed: content,
+            };
+          }
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              isAnswerCompleted = true;
+              loadingIndicator.classList.add("hidden");
+
+              // 处理剩余内容
+              if (speechCache.trim().length > 0) {
+                //SpeechPlayer.speechQueue.push(speechCache);
+                //SpeechPlayer.triggerSpeechCheck(inThinkingMode);
+                // 强制追加最后一段（即使未达阈值/无标点）
+                SpeechPlayer.addToSpeechQueue(speechCache, inThinkingMode);
+                speechCache = "";
+              }
+
+              statusEl.textContent = "回答已完成";
+
+              break;
+            }
+
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk
+              .split("\n")
+              .filter((line) => line.trim().startsWith("data: "));
+
+            lines.forEach((line) => {
+              const jsonStr = line.replace("data: ", "");
+              try {
+                const data = JSON.parse(jsonStr);
+
+                if (data.choices && data.choices[0]?.delta?.content) {
+                  const content = data.choices[0].delta.content;
+                  const processed = processContent(content);
+
+                  // 处理思考模式标记
+                  if (content === "<think>") {
                     inThinkingMode = true;
-                    console.log('不xiang')
-                    return {isMarker: true, processed: ''};
-                }
-                if (content === '<RichMediaReference>end') {  // 退出标记
+                    //thinkCurrentAnswerMarkdown += `<span class="think-content">`;
+                    console.log("进入思考模式");
+                    return;
+                  }
+                  if (content === "</think>") {
                     inThinkingMode = false;
-                    return {isMarker: true, processed: ''};
-                }
-                return {
-                    isMarker: false,
-                    processed: content
-                };
-            }
+                    thinkCurrentAnswerMarkdown += `</span>`;
+                    console.log("退出思考模式");
+                    return;
+                  }
 
-
-            while (true) {
-                const {done, value} = await reader.read();
-                if (done) {
-                    isAnswerCompleted = true;
-                    loadingIndicator.classList.add('hidden');
-
-
-                    // 处理剩余内容
-                    if (speechCache.trim().length > 0) {
-                        //SpeechPlayer.speechQueue.push(speechCache);
-                        //SpeechPlayer.triggerSpeechCheck(inThinkingMode);
-                        // 强制追加最后一段（即使未达阈值/无标点）
-                        SpeechPlayer.addToSpeechQueue(speechCache, inThinkingMode);
-                        speechCache = '';
+                  if (!processed.isMarker) {
+                    // 累积内容
+                    if (inThinkingMode) {
+                      thinkCurrentAnswerMarkdown += processed.processed;
+                    } else {
+                      currentAnswerMarkdown += processed.processed;
                     }
 
+                    // 更新UI
+                    const htmlContent = marked.parse(currentAnswerMarkdown);
+                    const thinkhtmlContent = marked.parse(
+                      thinkCurrentAnswerMarkdown
+                    );
+                    answerEl.innerHTML = htmlContent;
+                    thinkEl.innerHTML = thinkhtmlContent;
 
-                    statusEl.textContent = "回答已完成";
+                    // 实时添加新内容到语音缓存
+                    if (!SpeechPlayer.stopRequested) {
+                      speechCache += processed.processed;
+                      speechCache = SpeechPlayer.addToSpeechQueue(
+                        speechCache,
+                        inThinkingMode
+                      );
+                    }
 
-                    break;
+                    // 更新语音按钮文本
+                    //const fullText = thinkCurrentAnswerMarkdown + currentAnswerMarkdown;
+                    //speakBtn.setAttribute('data-text', SpeechPlayer.cleanText(fullText));
+                    //
+                    const fullText =
+                      thinkCurrentAnswerMarkdown + currentAnswerMarkdown;
+                    const cleanedFullText = SpeechPlayer.cleanText(fullText);
+                    speakBtn.setAttribute(
+                      "data-text",
+                      encodeURIComponent(cleanedFullText)
+                    );
+                    // 3. 更新语音按钮的data-text（确保手动点击时内容正确）
+                    if (
+                      !hasSimulatedClick &&
+                      cleanedFullText.trim().length > 0
+                    ) {
+                      speakBtn.click(); // 核心：模拟用户手动点击
+                      hasSimulatedClick = true;
+                      console.log("第一次自动读下");
+                    }
+                  }
                 }
 
-                const chunk = decoder.decode(value, {stream: true});
-                const lines = chunk.split('\n').filter(line => line.trim().startsWith('data: '));
-
-                lines.forEach(line => {
-                    const jsonStr = line.replace('data: ', '');
-                    try {
-                        const data = JSON.parse(jsonStr);
-
-                        if (data.choices && data.choices[0]?.delta?.content) {
-                            const content = data.choices[0].delta.content;
-                            const processed = processContent(content);
-
-                            // 处理思考模式标记
-                            if (content === '<think>') {
-                                inThinkingMode = true;
-                                //thinkCurrentAnswerMarkdown += `<span class="think-content">`;
-                                console.log('进入思考模式');
-                                return;
-                            }
-                            if (content === '</think>') {
-                                inThinkingMode = false;
-                                thinkCurrentAnswerMarkdown += `</span>`;
-                                console.log('退出思考模式');
-                                return;
-                            }
-
-                            if (!processed.isMarker) {
-
-                                // 累积内容
-                                if (inThinkingMode) {
-                                    thinkCurrentAnswerMarkdown += processed.processed;
-                                } else {
-                                    currentAnswerMarkdown += processed.processed;
-                                }
-
-                                // 更新UI
-                                const htmlContent = marked.parse(currentAnswerMarkdown);
-                                const thinkhtmlContent = marked.parse(thinkCurrentAnswerMarkdown);
-                                answerEl.innerHTML = htmlContent;
-                                thinkEl.innerHTML = thinkhtmlContent;
-
-                                // 实时添加新内容到语音缓存
-                                if (!SpeechPlayer.stopRequested) {
-                                    speechCache += processed.processed;
-                                    speechCache = SpeechPlayer.addToSpeechQueue(
-                                        speechCache,
-                                        inThinkingMode
-                                    );
-                                }
-
-                                // 更新语音按钮文本
-                                //const fullText = thinkCurrentAnswerMarkdown + currentAnswerMarkdown;
-                                //speakBtn.setAttribute('data-text', SpeechPlayer.cleanText(fullText));
-                                //
-                                const fullText = thinkCurrentAnswerMarkdown + currentAnswerMarkdown;
-                                const cleanedFullText = SpeechPlayer.cleanText(fullText);
-                                speakBtn.setAttribute('data-text', encodeURIComponent(cleanedFullText));
-                                // 3. 更新语音按钮的data-text（确保手动点击时内容正确）
-                                if (!hasSimulatedClick && cleanedFullText.trim().length > 0) {
-                                    speakBtn.click(); // 核心：模拟用户手动点击
-                                    hasSimulatedClick = true;
-                                    console.log('第一次自动读下');
-                                }
-
-
-                            }
-
-
-                        }
-
-                        // 文献处理逻辑（保持不变）
-                        if (data.chunks && data.chunks.length > 0) {
-                            data.chunks.forEach(doc => {
-                                const docKey = `${doc.datasetId}-${doc.documentId}`;
-                                if (!seenDocs.has(docKey)) {
-                                    seenDocs.add(docKey);
-                                    const docLink = document.createElement('a');
-                                    docLink.href = `/download_doc/${doc.datasetId}/${doc.documentId}/${doc.documentName}`;
-                                    docLink.className = 'inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded m-1';
-                                    docLink.textContent = doc.documentName;
-                                    docLink.target = '_blank';
-                                    docsEl.appendChild(docLink);
-                                    window.currentDocs.push({
-                                        datasetId: doc.datasetId,
-                                        documentId: doc.documentId,
-                                        documentName: doc.documentName
-                                    });
-                                }
-                            });
-
-                            if (window.currentDocs.length > 0 && currentAnswerMarkdown) {
-                                const {
-                                    processedAnswer,
-                                    processedThink
-                                } = replaceDocNamesInFullAnswer(currentAnswerMarkdown, thinkCurrentAnswerMarkdown);
-                                const htmlContent = marked.parse(processedAnswer);
-                                const thinkHtmlContent = marked.parse(processedThink);
-                                answerEl.innerHTML = htmlContent;
-                                thinkEl.innerHTML = thinkHtmlContent;
-
-                                const aiMessage = {
-                                    role: 'system',
-                                    content: htmlContent,
-                                    thinking: thinkHtmlContent,
-                                    documents: currentDocs,
-                                    timestamp: new Date().toISOString()
-                                };
-                                const currentConvIndex = conversations.findIndex(c => c.id === currentConversationId);
-                                if (currentConvIndex !== -1) {
-                                    conversations[currentConvIndex].messages.push(aiMessage);
-                                    conversations[currentConvIndex].timestamp = new Date().toISOString();
-                                }
-                                saveConversations();
-                                renderConversationsList();
-                            }
-                        }
-
-                        if (data.choices && data.choices[0]?.finishReason) {
-                            const finishReason = data.choices[0].finishReason;
-                            statusEl.textContent = finishReason === 'finished' ? "连接失败，请稍后重试" : "回答生成中...";
-                        }
-
-                    } catch (e) {
-                        console.error('解析JSON失败:', e, '原始数据:', jsonStr);
+                // 文献处理逻辑（保持不变）
+                if (data.chunks && data.chunks.length > 0) {
+                  data.chunks.forEach((doc) => {
+                    const docKey = `${doc.datasetId}-${doc.documentId}`;
+                    if (!seenDocs.has(docKey)) {
+                      seenDocs.add(docKey);
+                      const docLink = document.createElement("a");
+                      docLink.href = `/download_doc/${doc.datasetId}/${doc.documentId}/${doc.documentName}`;
+                      docLink.className =
+                        "inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded m-1";
+                      docLink.textContent = doc.documentName;
+                      docLink.target = "_blank";
+                      docsEl.appendChild(docLink);
+                      window.currentDocs.push({
+                        datasetId: doc.datasetId,
+                        documentId: doc.documentId,
+                        documentName: doc.documentName,
+                      });
                     }
-                });
-            }
+                  });
 
-            // 结束处理
-            loadingIndicator.classList.add('hidden');
-            startBtn.disabled = false;
-            transcriptInput.value = '';
-            askBtn.disabled = true;
+                  if (window.currentDocs.length > 0 && currentAnswerMarkdown) {
+                    const { processedAnswer, processedThink } =
+                      replaceDocNamesInFullAnswer(
+                        currentAnswerMarkdown,
+                        thinkCurrentAnswerMarkdown
+                      );
+                    const htmlContent = marked.parse(processedAnswer);
+                    const thinkHtmlContent = marked.parse(processedThink);
+                    answerEl.innerHTML = htmlContent;
+                    thinkEl.innerHTML = thinkHtmlContent;
 
+                    const aiMessage = {
+                      role: "system",
+                      content: htmlContent,
+                      thinking: thinkHtmlContent,
+                      documents: currentDocs,
+                      timestamp: new Date().toISOString(),
+                    };
+                    const currentConvIndex = conversations.findIndex(
+                      (c) => c.id === currentConversationId
+                    );
+                    if (currentConvIndex !== -1) {
+                      conversations[currentConvIndex].messages.push(aiMessage);
+                      conversations[currentConvIndex].timestamp =
+                        new Date().toISOString();
+                    }
+                    saveConversations();
+                    renderConversationsList();
+                  }
+                }
+
+                if (data.choices && data.choices[0]?.finishReason) {
+                  const finishReason = data.choices[0].finishReason;
+                  statusEl.textContent =
+                    finishReason === "finished"
+                      ? "连接失败，请稍后重试"
+                      : "回答生成中...";
+                }
+              } catch (e) {
+                console.error("解析JSON失败:", e, "原始数据:", jsonStr);
+              }
+            });
+          }
+
+          // 结束处理
+          loadingIndicator.classList.add("hidden");
+          startBtn.disabled = false;
+          transcriptInput.value = "";
+          askBtn.disabled = true;
         } catch (error) {
-            console.error('获取答案失败:', error);
-            statusEl.textContent = `获取答案失败: ${error.message}`;
-            loadingIndicator.classList.add('hidden');
-            startBtn.disabled = false;
-            askBtn.disabled = false;
+          console.error("获取答案失败:", error);
+          statusEl.textContent = `获取答案失败: ${error.message}`;
+          loadingIndicator.classList.add("hidden");
+          startBtn.disabled = false;
+          askBtn.disabled = false;
         }
-    }
+      }
 
-    // 新增：批量替换完整答案中的文献名称为链接，并重新渲染
-    // 修复：完整实现批量替换文献名称为链接的函数
-    function replaceDocNamesInFullAnswer(originalAnswer, originalThink) {
-        console.log('替换前的完整答案：', originalAnswer);
+      // 新增：批量替换完整答案中的文献名称为链接，并重新渲染
+      // 修复：完整实现批量替换文献名称为链接的函数
+      function replaceDocNamesInFullAnswer(originalAnswer, originalThink) {
+        console.log("替换前的完整答案：", originalAnswer);
 
-        let processedAnswer = originalAnswer || '';
-        let processedThink = originalThink || '';
+        let processedAnswer = originalAnswer || "";
+        let processedThink = originalThink || "";
 
         // 遍历所有文献，替换文本中的文献名称为链接
-        window.currentDocs.forEach(doc => {
-            const docName = doc.documentName;
-            // 转义文献名称中的特殊字符（避免干扰正则匹配）
-            const safeDocName = docName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            // 处理不带.pdf后缀的情况
-            const safeDocNameWithoutPdf = safeDocName.replace(/\.pdf$/i, '');
+        window.currentDocs.forEach((doc) => {
+          const docName = doc.documentName;
+          // 转义文献名称中的特殊字符（避免干扰正则匹配）
+          const safeDocName = docName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          // 处理不带.pdf后缀的情况
+          const safeDocNameWithoutPdf = safeDocName.replace(/\.pdf$/i, "");
 
-            // 正则规则：匹配可能被`包裹的文献名称
-            // 捕获组说明：
-            // 1. 匹配文献名称前可能存在的`符号（0个或多个）
-            // 2. 匹配文献名称本身（带或不带.pdf）
-            // 3. 匹配文献名称后可能存在的`符号（0个或多个）
-            const docReg = new RegExp(
-                `(?<!\\[)(\`*)(\\b${safeDocName}\\b|\\b${safeDocNameWithoutPdf}\\b)(\`*)(?!\\])`,
-                'gi'
-            );
+          // 正则规则：匹配可能被`包裹的文献名称
+          // 捕获组说明：
+          // 1. 匹配文献名称前可能存在的`符号（0个或多个）
+          // 2. 匹配文献名称本身（带或不带.pdf）
+          // 3. 匹配文献名称后可能存在的`符号（0个或多个）
+          const docReg = new RegExp(
+            `(?<!\\[)(\`*)(\\b${safeDocName}\\b|\\b${safeDocNameWithoutPdf}\\b)(\`*)(?!\\])`,
+            "gi"
+          );
 
-            // 替换非思考模式的文本
-            processedAnswer = processedAnswer.replace(docReg, (match, prefixTicks, cleanDocName, suffixTicks) => {
-                // 忽略前后的`符号，使用纯净的文献名称创建链接
-                return `[${cleanDocName}](${window.location.origin}/download_doc/${doc.datasetId}/${doc.documentId}/${doc.documentName})`;
-            });
+          // 替换非思考模式的文本
+          processedAnswer = processedAnswer.replace(
+            docReg,
+            (match, prefixTicks, cleanDocName, suffixTicks) => {
+              // 忽略前后的`符号，使用纯净的文献名称创建链接
+              return `[${cleanDocName}](${window.location.origin}/download_doc/${doc.datasetId}/${doc.documentId}/${doc.documentName})`;
+            }
+          );
 
-            // 替换思考模式的文本
-            processedThink = processedThink.replace(docReg, (match, prefixTicks, cleanDocName, suffixTicks) => {
-                // 忽略前后的`符号，使用纯净的文献名称创建链接
-                return `[${cleanDocName}](${window.location.origin}/download_doc/${doc.datasetId}/${doc.documentId}/${doc.documentName})`;
-            });
+          // 替换思考模式的文本
+          processedThink = processedThink.replace(
+            docReg,
+            (match, prefixTicks, cleanDocName, suffixTicks) => {
+              // 忽略前后的`符号，使用纯净的文献名称创建链接
+              return `[${cleanDocName}](${window.location.origin}/download_doc/${doc.datasetId}/${doc.documentId}/${doc.documentName})`;
+            }
+          );
         });
 
-        console.log('替换后的完整思考答案：', processedThink);
-        console.log('替换后的完整答案：', processedAnswer);
-        return {processedAnswer, processedThink};
-    }
+        console.log("替换后的完整思考答案：", processedThink);
+        console.log("替换后的完整答案：", processedAnswer);
+        return { processedAnswer, processedThink };
+      }
 
+      let voices = [];
+      let voiceSelect;
 
-    let voices = [];
-    let voiceSelect;
-
-    // 定义一个名为loadVoices的函数，用于加载可用语音并创建选择控件
-    function loadVoices() {
-
-        console.log('加载语音');
-        console.log('sidebar', sidebar);
+      // 定义一个名为loadVoices的函数，用于加载可用语音并创建选择控件
+      function loadVoices() {
+        console.log("加载语音");
+        console.log("sidebar", sidebar);
         // 获取浏览器支持的所有语音合成声音列表
         // window.speechSynthesis是浏览器内置的语音合成API
         const voices = window.speechSynthesis.getVoices();
 
         // 遍历页面中所有class为"voiceDropdown"的元素
-        document.querySelectorAll(".voiceDropdown").forEach(dropdownEl => {
-            // 在每个下拉容器中查找select元素
-            let voiceSelect = dropdownEl.querySelector("select");
+        document.querySelectorAll(".voiceDropdown").forEach((dropdownEl) => {
+          // 在每个下拉容器中查找select元素
+          let voiceSelect = dropdownEl.querySelector("select");
 
-            // 如果容器中没有select元素，则创建一个新的
-            if (!voiceSelect) {
-                voiceSelect = document.createElement("select");
-                // 给select添加样式类：边框、圆角、内边距和宽度
-                voiceSelect.className = "border rounded p-1 w-48";
-                // 将创建的select元素添加到容器中
-                dropdownEl.appendChild(voiceSelect);
+          // 如果容器中没有select元素，则创建一个新的
+          if (!voiceSelect) {
+            voiceSelect = document.createElement("select");
+            // 给select添加样式类：边框、圆角、内边距和宽度
+            voiceSelect.className = "border rounded p-1 w-48";
+            // 将创建的select元素添加到容器中
+            dropdownEl.appendChild(voiceSelect);
 
-                // 给select添加change事件监听器
-                // 当选择项改变时，将选中的值保存到localStorage中
-                voiceSelect.addEventListener("change", () => {
-                    localStorage.setItem("selectedVoice", voiceSelect.value);
-                });
-            }
-
-            // 清空select中的所有选项（避免重复添加）
-            voiceSelect.innerHTML = "";
-            const filteredVoices = voices.filter(voice =>
-                voice.lang.startsWith('zh') || voice.lang.startsWith('en')
-            );
-            // 遍历所有可用语音，为每个语音创建一个选项
-            filteredVoices.forEach((voice, i) => {
-                const option = document.createElement("option");
-                // 选项值设为索引i
-                option.value = i;
-                // 选项文本显示为"语音名称 (语言代码)"
-                option.textContent = `${voice.name} (${voice.lang})`;
-                // 将选项添加到select中
-                voiceSelect.appendChild(option);
+            // 给select添加change事件监听器
+            // 当选择项改变时，将选中的值保存到localStorage中
+            voiceSelect.addEventListener("change", () => {
+              localStorage.setItem("selectedVoice", voiceSelect.value);
             });
+          }
 
-            // 从localStorage中获取之前保存的选中语音
-            const saved = localStorage.getItem("selectedVoice");
-            // 如果有保存的值，并且对应的选项存在，则设置为选中状态
-            if (saved && voiceSelect.options[saved]) {
-                voiceSelect.value = saved;
-                console.log(saved, '选这个音色');
-            }
+          // 清空select中的所有选项（避免重复添加）
+          voiceSelect.innerHTML = "";
+          const filteredVoices = voices.filter(
+            (voice) =>
+              voice.lang.startsWith("zh") || voice.lang.startsWith("en")
+          );
+          // 遍历所有可用语音，为每个语音创建一个选项
+          filteredVoices.forEach((voice, i) => {
+            const option = document.createElement("option");
+            // 选项值设为索引i
+            option.value = i;
+            // 选项文本显示为"语音名称 (语言代码)"
+            option.textContent = `${voice.name} (${voice.lang})`;
+            // 将选项添加到select中
+            voiceSelect.appendChild(option);
+          });
+
+          // 从localStorage中获取之前保存的选中语音
+          const saved = localStorage.getItem("selectedVoice");
+          // 如果有保存的值，并且对应的选项存在，则设置为选中状态
+          if (saved && voiceSelect.options[saved]) {
+            voiceSelect.value = saved;
+            console.log(saved, "选这个音色");
+          }
         });
-    }
+      }
 
-    // voices 可能异步加载
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    document.addEventListener("DOMContentLoaded", loadVoices);
+      // voices 可能异步加载
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+      document.addEventListener("DOMContentLoaded", loadVoices);
 
-    // 点击图标展开/隐藏
-    document.addEventListener("click", (e) => {
-        console.log('点击图标展开/隐藏');
+      // 点击图标展开/隐藏
+      document.addEventListener("click", (e) => {
+        console.log("点击图标展开/隐藏");
         loadVoices();
 
         if (e.target.closest(".voiceToggle")) {
-            const dropdown = e.target.closest(".voiceToggle").parentNode.querySelector(".voiceDropdown");
-            dropdown.classList.toggle("hidden");
-
+          const dropdown = e.target
+            .closest(".voiceToggle")
+            .parentNode.querySelector(".voiceDropdown");
+          dropdown.classList.toggle("hidden");
         }
-    });
+      });
 
-
-    // 在页面加载时执行
-    document.addEventListener('DOMContentLoaded', async () => {
+      // 在页面加载时执行
+      document.addEventListener("DOMContentLoaded", async () => {
         // 检查是否有存储的token
-        const token = localStorage.getItem('currentUser_token');
+        const token = localStorage.getItem("currentUser_token");
 
         if (token) {
-            // 验证token有效性并恢复登录状态
-            try {
-                const response = await fetch('/verify_token', {
-                    method: 'GET',
-                    headers: {'Authorization': `Bearer ${token}`}
-                });
+          // 验证token有效性并恢复登录状态
+          try {
+            const response = await fetch("/verify_token", {
+              method: "GET",
+              headers: { Authorization: `Bearer ${token}` },
+            });
 
-                if (response.ok) {
-                    // token有效，恢复登录状态
-                    isLoggedIn = true;
-                    updateUIForLogin();
-                    // loadHistory(); // 加载历史记录
-
-                } else {
-                    // token无效或过期，清除存储
-                    logout();
-                }
-            } catch (error) {
-                console.error('验证token失败', error);
-                logout();
+            if (response.ok) {
+              // token有效，恢复登录状态
+              isLoggedIn = true;
+              updateUIForLogin();
+              // loadHistory(); // 加载历史记录
+            } else {
+              // token无效或过期，清除存储
+              logout();
             }
+          } catch (error) {
+            console.error("验证token失败", error);
+            logout();
+          }
         } else {
-            // 无token，显示登录界面
-            loadAnonymousConversation();
-            loginModal.classList.remove('hidden');
+          // 无token，显示登录界面
+          loadAnonymousConversation();
+          loginModal.classList.remove("hidden");
         }
-    });
+      });
 
-
-    // 登出函数
-    function logout() {
+      // 登出函数
+      function logout() {
         // 清除存储的登录信息
-        localStorage.removeItem('currentUser_token');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem("currentUser_token");
+        localStorage.removeItem("currentUser");
+        localStorage.removeItem("isLoggedIn");
 
         // 重置UI到未登录状态
 
+        document.getElementById("logoutBtn").style.display = "none";
 
-        document.getElementById('logoutBtn').style.display = 'none';
+        document.getElementById("newConversationBtn").classList.add("hidden");
 
-
-        document.getElementById('newConversationBtn').classList.add('hidden');
-
-
-        userInfo.classList.add('hidden');
-        document.getElementById('loginBtn').classList.remove('hidden');
+        userInfo.classList.add("hidden");
+        document.getElementById("loginBtn").classList.remove("hidden");
         // 清空对话内容
-        document.getElementById('messageContainer').innerHTML = '';
-        document.getElementById('conversationsList').innerHTML = '';
+        document.getElementById("messageContainer").innerHTML = "";
+        document.getElementById("conversationsList").innerHTML = "";
         location.reload();
-    }
+      }
 
-    // 生成简单的UUID v4风格标识符
-    function generateUUID() {
-        console.log('生成UUID');
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      // 生成简单的UUID v4风格标识符
+      function generateUUID() {
+        console.log("生成UUID");
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+          /[xy]/g,
+          function (c) {
+            const r = (Math.random() * 16) | 0;
+            const v = c === "x" ? r : (r & 0x3) | 0x8;
             return v.toString(16);
-        });
-    }
+          }
+        );
+      }
 
-
-    function createNewConversation() {
+      function createNewConversation() {
         // 重置当前对话ID
-        console.log('创建新对话 - 登录状态:', isLoggedIn);
-        console.log('当前用户:', currentUser);
+        console.log("创建新对话 - 登录状态:", isLoggedIn);
+        console.log("当前用户:", currentUser);
         currentConversationId = generateUUID();
-        console.log('当前对话ID:', currentConversationId);
+        console.log("当前对话ID:", currentConversationId);
 
         // 清空消息容器
-        messageContainer.innerHTML = '';
+        messageContainer.innerHTML = "";
 
         // 清空转录文本输入框
-        transcriptInput.value = '';
+        transcriptInput.value = "";
         updateInputState(); // 新增：更新输入框状态
 
         // 重置按钮状态
@@ -2081,64 +2241,61 @@
         askBtn.disabled = true;
 
         // 更新状态提示
-        statusEl.textContent = "请点击\"开始录音\"按钮输入您的问题";
+        statusEl.textContent = '请点击"开始录音"按钮输入您的问题';
 
         // 隐藏加载指示器
-        loadingIndicator.classList.add('hidden');
+        loadingIndicator.classList.add("hidden");
 
         // 如果是移动设备，创建新对话后关闭侧边栏
 
-
         // 添加新对话到历史记录
         const newConversation = {
-            id: currentConversationId,
-            title: "新对话",
-            timestamp: new Date().toISOString(),
-            messages: []
+          id: currentConversationId,
+          title: "新对话",
+          timestamp: new Date().toISOString(),
+          messages: [],
         };
 
         conversations.unshift(newConversation);
-        console.log('创建新队话的是isloggedin', isLoggedIn);
+        console.log("创建新队话的是isloggedin", isLoggedIn);
         // 根据登录状态分别处理保存逻辑
         if (isLoggedIn && currentUser) {
-            // 登录状态 - 保存到服务器和本地存储
+          // 登录状态 - 保存到服务器和本地存储
 
-            saveConversations();
+          saveConversations();
 
-            // 同步更新服务器历史记录
-            loadHistory();
+          // 同步更新服务器历史记录
+          loadHistory();
         } else {
-            // 未登录状态 - 只保存到本地存储
-            localStorage.setItem('anonymous_conversations', JSON.stringify(conversations));
-            renderConversationsList();
+          // 未登录状态 - 只保存到本地存储
+          localStorage.setItem(
+            "anonymous_conversations",
+            JSON.stringify(conversations)
+          );
+          renderConversationsList();
         }
-    }
+      }
 
+      // 1. 首先按钮点击导致页面刷新
+      document
+        .getElementById("newConversationBtn")
+        .addEventListener("click", function (e) {
+          // 阻止默认行为（如果按钮在表单中，可能会触发提交导致刷新）
+          e.preventDefault();
+          // 阻止事件冒泡
+          e.stopPropagation();
+          createNewConversation();
+        });
+      // 页面加载时初始化
 
-    // 1. 首先按钮点击导致页面刷新
-    document.getElementById('newConversationBtn').addEventListener('click', function (e) {
-        // 阻止默认行为（如果按钮在表单中，可能会触发提交导致刷新）
-        e.preventDefault();
-        // 阻止事件冒泡
-        e.stopPropagation();
-        createNewConversation();
-    });
-    // 页面加载时初始化
-
-    document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         setupEventListeners();
 
         adjustTextareaHeight();
+      });
 
-
-    });
-
-
-    // 页面加载时初始化应用
-    window.addEventListener('DOMContentLoaded', initApp);
-
-
-</script>
-</body>
-
+      // 页面加载时初始化应用
+      window.addEventListener("DOMContentLoaded", initApp);
+    </script>
+  </body>
 </html>
