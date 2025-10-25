@@ -1,0 +1,6 @@
+flask>=2.3.0
+requests>=2.28.0
+pydub>=0.25.1
+flask-sqlalchemy>=3.0.3
+pyjwt>=2.4.0
+edge-tts>=6.1.0

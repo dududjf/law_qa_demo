@@ -1,19 +1,27 @@
 import os
 import json
-import time
 import requests
 import urllib3
-from flask import Flask, request, jsonify, render_template, send_file, session
-from gtts import gTTS
-import tempfile
+from flask import render_template, session
 from pydub import AudioSegment
 import io
-import random, threading
+import random
 from functools import wraps
 
 from flask_sqlalchemy import SQLAlchemy
 import datetime
-from datetime import timedelta
+
+import jwt  # 需要安装 PyJWT 库
+from datetime import datetime, timedelta
+import edge_tts
+import asyncio
+
+import tempfile
+import uuid  # 用于生成唯一文件名
+import time
+import threading
+# 在现有导入语句中添加 Response
+from flask import Flask, request, jsonify, send_file,  Response
 
 urllib3.disable_warnings()
 app = Flask(__name__)
@@ -64,9 +72,6 @@ VALID_ACCOUNTS = {
     'user3': '123456'
 }
 
-from flask import request, jsonify
-import jwt  # 需要安装 PyJWT 库
-from datetime import datetime, timedelta
 
 
 # 生成 token（登录成功时）
@@ -410,13 +415,7 @@ def download_document(dataset_id, doc_id, doc_name):
         return jsonify({'error': str(e)}), 500
 
 
-import edge_tts
-import asyncio
-import tempfile
 
-import os
-import tempfile
-import uuid  # 用于生成唯一文件名
 
 # 获取当前 Python 文件（app.py）所在的目录的绝对路径
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -467,12 +466,6 @@ def text_to_speech():
             os.remove(audio_path)
         return jsonify({'error': f"语音生成失败: {str(e)}"}), 500
 
-
-import os
-import time
-import threading
-# 在现有导入语句中添加 Response
-from flask import Flask, request, jsonify, send_file, after_this_request, Response
 
 
 @app.route('/audio/<path:filename>')
