@@ -548,6 +548,8 @@ if __name__ == '__main__':
     # 注意：生产环境需要使用 proper WSGI 服务器和有效的SSL证书
     # app.run(ssl_context='adhoc', debug=True)  # adhoc 仅用于测试
     # app.run(debug=True, host='0.0.0.0', port=5000)
+
+    #改成你的本地绝对路径这个是用来作为https的证书的
     ssl_context = (
         "D:/360MoveData/Users/韩琪琪/Desktop/judgemodel/ssl_certs/localhost.crt",
         "D:/360MoveData/Users/韩琪琪/Desktop/judgemodel/ssl_certs/localhost.key"
