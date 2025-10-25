@@ -29,7 +29,6 @@ pip install -r requirements.txt
 ## 运行方式
 python app.py
 
-可以在
 
 
 ![界面截图](./images/main-page.png)

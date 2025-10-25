@@ -514,13 +514,14 @@ def text_to_speech_stream():
 
 if __name__ == "__main__":
     # 注意：生产环境需要使用 proper WSGI 服务器和有效的SSL证书
-    # app.run(ssl_context='adhoc', debug=True)  # adhoc 仅用于测试
     # app.run(debug=True, host='0.0.0.0', port=5000)
+    # 获取当前文件的目录
+    base_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # 改成你的本地绝对路径这个是用来作为https的证书的
+    # 构建 SSL 证书的相对路径
     ssl_context = (
-        "D:/360MoveData/Users/韩琪琪/Desktop/judgemodel/ssl_certs/localhost.crt",
-        "D:/360MoveData/Users/韩琪琪/Desktop/judgemodel/ssl_certs/localhost.key",
+        os.path.join(base_dir, "ssl_certs", "localhost.crt"),
+        os.path.join(base_dir, "ssl_certs", "localhost.key"),
     )
     # 启动 HTTPS 服务（host 设为 0.0.0.0 允许局域网访问）
     app.run(
