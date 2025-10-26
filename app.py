@@ -27,10 +27,10 @@ urllib3.disable_warnings()
 app = Flask(__name__)
 app.secret_key = "abcd"
 # 配置参数
-VOICE_SERVER_URL = "http://106.13.229.118:9061/v1/audio/transcriptions"
+VOICE_SERVER_URL = "你的url"
 QA_URL = "https://192.168.252.132:38443/apiaccess/modelmate/north/machine/v1/conversations/completions"
 DOC_URL = "https://192.168.252.132:38443/apiaccess/modelmate/north/machine/v1/documents/download"
-API_KEY = "2006|sk-AMCBBnuSqDBi4iXj09eKXOGKIxSXukgd"
+API_KEY = "你的key"
 USER_ID = "1753323987000104291"
 # ASSISTANT_ID = '68cd08aad147429cb1aab72126425ae7' 之前的
 ASSISTANT_ID = "68cd08aad147429cb1aab72126425ae7"
